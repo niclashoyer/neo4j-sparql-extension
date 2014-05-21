@@ -1,0 +1,7 @@
+*~
+target/
+*.swp
+*.swo
+nbactions.xml
+test/
+src/main/resources/
