@@ -8,6 +8,10 @@ public class AbstractSailsResource {
 	protected final SailConnection sc;
 	protected final ValueFactory vf;
 	
+	protected static class Status {
+		public static int NOT_IMPLEMENTED = 501;
+	}
+	
 	public AbstractSailsResource(SailConnection sc, ValueFactory vf) {
 		this.sc = sc;
 		this.vf = vf;

@@ -29,7 +29,7 @@ public class GraphStore extends AbstractSailsResource {
 	public Response graphIndirectGet(
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 	
 	@PUT
@@ -63,7 +63,7 @@ public class GraphStore extends AbstractSailsResource {
 	public Response graphIndirectDelete(
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 	
 	@POST
@@ -71,14 +71,14 @@ public class GraphStore extends AbstractSailsResource {
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
 			InputStream in) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 	
 	@GET
 	@Path("/{graph}")
 	public Response graphDirectGet(
 			@PathParam("graph") String graphString) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 	
 	@PUT
@@ -86,14 +86,14 @@ public class GraphStore extends AbstractSailsResource {
 	public Response graphDirectPut(
 			@PathParam("graph") String graphString,
 			InputStream in) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 	
 	@DELETE
 	@Path("/{graph}")
 	public Response graphDirectDelete(
 			@PathParam("graph") String graphString) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 	
 	@POST
@@ -101,7 +101,7 @@ public class GraphStore extends AbstractSailsResource {
 	public Response graphDirectPost(
 			@PathParam("graph") String graphString,
 			InputStream in) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 	
 }

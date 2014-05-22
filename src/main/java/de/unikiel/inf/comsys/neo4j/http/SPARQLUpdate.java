@@ -23,7 +23,7 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			@FormParam("update") String query,
 			@FormParam("using-graph-uri") List<String> defgraphs,
 			@FormParam("using-named-graph-uri") List<String> namedgraphs) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 
 	@POST
@@ -32,6 +32,6 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			@FormParam("using-graph-uri") List<String> defgraphs,
 			@FormParam("using-named-graph-uri") List<String> namedgraphs,
 			InputStream query) {
-		return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+		return Response.status(Status.NOT_IMPLEMENTED).build();
 	}
 }
