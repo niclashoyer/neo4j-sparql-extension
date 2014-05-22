@@ -1,5 +1,5 @@
 
-package de.unikiel.inf.comsys.neo4j;
+package de.unikiel.inf.comsys.neo4j.rio;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
