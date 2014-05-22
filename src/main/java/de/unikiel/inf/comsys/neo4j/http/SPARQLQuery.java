@@ -2,12 +2,18 @@
 package de.unikiel.inf.comsys.neo4j.http;
 
 import info.aduna.iteration.CloseableIteration;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.List;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
@@ -43,4 +49,22 @@ public class SPARQLQuery extends AbstractSailsResource {
 					str.getBytes(Charset.forName("UTF-8"))).build();
 		}
     }
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response queryPOSTEncoded(
+			@FormParam("query") String query,
+			@FormParam("default-graph-uri") List<String> defgraphs,
+			@FormParam("named-graph-uri") List<String> namedgraphs) {
+		return Response.status(Status.NOT_IMPLEMENTED).build();
+	}
+
+	@POST
+	@Consumes("application/sparql-query")
+	public Response queryPOSTDirect(
+			@FormParam("default-graph-uri") List<String> defgraphs,
+			@FormParam("named-graph-uri") List<String> namedgraphs,
+			InputStream query) {
+		return Response.status(Status.NOT_IMPLEMENTED).build();
+	}
 }
