@@ -69,6 +69,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 					                   .getMediaType();
 			final String    mtstr = mt.getType() + "/" + mt.getSubtype();
 			switch(mtstr) {
+				default:
 				case RDFMediaType.SPARQL_RESULTS_JSON:
 					factory = new SPARQLResultsJSONWriterFactory();
 					break;
@@ -80,9 +81,6 @@ public class SPARQLQuery extends AbstractSailsResource {
 					break;
 				case RDFMediaType.SPARQL_RESULTS_TSV:
 					factory = new SPARQLResultsTSVWriterFactory();
-					break;
-				default:
-					factory = new SPARQLResultsJSONWriterFactory();
 					break;
 			}
 			final CloseableIteration<? extends BindingSet, QueryEvaluationException> results;
