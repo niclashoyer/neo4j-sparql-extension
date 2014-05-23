@@ -16,13 +16,13 @@ import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
 
-public class SPARQLStreamingOutput implements StreamingOutput {
+public class SPARQLResultStreamingOutput implements StreamingOutput {
 
 	private final ParsedQuery query;
 	private final CloseableIteration<? extends BindingSet, QueryEvaluationException> results;
 	private final TupleQueryResultWriterFactory factory;
 	
-	public SPARQLStreamingOutput(
+	public SPARQLResultStreamingOutput(
 		ParsedQuery query,
 		CloseableIteration<? extends BindingSet, QueryEvaluationException> results,
 		TupleQueryResultWriterFactory writerFactory) {
@@ -48,6 +48,12 @@ public class SPARQLStreamingOutput implements StreamingOutput {
 			} catch (QueryEvaluationException |
 					 QueryResultHandlerException ex) {
 				throw new WebApplicationException(ex);
+			} finally {
+				try {
+					results.close();
+				} catch (QueryEvaluationException ex) {
+					throw new WebApplicationException(ex);
+				}
 			}
 	}
 	

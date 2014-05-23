@@ -20,8 +20,9 @@ public class AbstractSailsResource {
 		public static final String SPARQL_QUERY = "application/sparql-query";
 		public static final String SPARQL_UPDATE = "application/sparql-update";
 		public static final String RDF_TURTLE = "text/turtle";
-		public static final String RDF_JSONLD = "application/ld+json";
+		public static final String RDF_JSON = "application/rdf+json";
 		public static final String RDF_XML = "application/rdf+xml";
+		public static final String RDF_NTRIPLES = "application/n-triples";
 	}
 	
 	public AbstractSailsResource(SailConnection sc, ValueFactory vf) {

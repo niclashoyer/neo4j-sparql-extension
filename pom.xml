@@ -59,6 +59,16 @@
 			<version>${sesame.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-rdfxml</artifactId>
+			<version>${sesame.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-rdfjson</artifactId>
+			<version>${sesame.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.neo4j.app</groupId>
 			<artifactId>neo4j-server</artifactId>
 			<version>${neo4j.version}</version>
