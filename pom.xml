@@ -116,6 +116,31 @@
             <version>${jackson.version}</version>
 			<scope>test</scope>
         </dependency>
+		<dependency>
+			<artifactId>sesame-queryresultio-sparqlxml</artifactId>
+			<groupId>org.openrdf.sesame</groupId>
+			<type>jar</type>
+			<version>${sesame.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>sesame-queryresultio-sparqljson</artifactId>
+			<groupId>org.openrdf.sesame</groupId>
+			<type>jar</type>
+			<version>${sesame.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>sesame-queryresultio-text</artifactId>
+			<groupId>org.openrdf.sesame</groupId>
+			<type>jar</type>
+			<version>${sesame.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<type>jar</type>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
