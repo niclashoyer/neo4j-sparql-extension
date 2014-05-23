@@ -5,5 +5,8 @@ notifications:
   email: false
 install:
   - mvn clean install -DskipTests=true
+script:
+  - mvn cobertura:cobertura
 after_script:
   - cp -r target/surefire-reports/* shippable/testresults/
+  - cp -r target/site/cobertura/* shippable/codecoverage/
