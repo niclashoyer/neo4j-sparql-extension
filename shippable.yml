@@ -5,3 +5,5 @@ notifications:
   email: false
 install:
   - mvn clean install -DskipTests=true
+after_script:
+  - cp -r target/surefire-reports/* shippable/testresults/
