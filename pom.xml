@@ -207,6 +207,21 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<configuration>
+							<licenseMerges>
+								<licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0|Apache License|Apache 2</licenseMerge>
+								<licenseMerge>New BSD License|BSD 3-Clause|BSD-like|Aduna BSD license</licenseMerge>
+								<licenseMerge>The MIT License|MIT License|Bouncy Castle License</licenseMerge>
+								<licenseMerge>GNU General Public License, Version 2|Dual license consisting of the CDDL v1.1 and GPL v2</licenseMerge>
+								<licenseMerge>GNU General Public License, Version 2 with ClassPath Exception|GPL2 w/ CPE</licenseMerge>
+							</licenseMerges>
+							<useMissingFile>true</useMissingFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
