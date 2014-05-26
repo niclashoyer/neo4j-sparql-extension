@@ -9,9 +9,11 @@ import de.unikiel.inf.comsys.neo4j.http.SPARQLQuery;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 @Path("/")
@@ -21,15 +23,15 @@ public class RDFServerExtension {
 	private final SPARQLQuery query;
 	private final GraphStore graphStore;
 
-    public RDFServerExtension(@Context GraphDatabaseService database) throws SailException {
+    public RDFServerExtension(@Context GraphDatabaseService database) throws SailException, RepositoryException {
         this.database = database;
 		Graph graph = new Neo4j2Graph(database);
 		Sail sail = new GraphSail((KeyIndexableGraph) graph);
-		sail.initialize();
-		SailConnection sc = sail.getConnection();
-		ValueFactory vf = sail.getValueFactory();
-		query = new SPARQLQuery(sc, vf);
-		graphStore = new GraphStore(sc, vf);
+		Repository rep = new SailRepository(sail);
+		rep.initialize();
+		RepositoryConnection conn = rep.getConnection();
+		query = new SPARQLQuery(conn);
+		graphStore = new GraphStore(conn);
     }
 
 	@Path("/graph")

@@ -20,35 +20,33 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
-import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.GraphQuery;
 import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.Query;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.impl.EmptyBindingSet;
-import org.openrdf.query.parser.ParsedGraphQuery;
-import org.openrdf.query.parser.ParsedQuery;
-import org.openrdf.query.parser.QueryParserUtil;
+import org.openrdf.query.TupleQuery;
 import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
 import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriterFactory;
 import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriterFactory;
 import org.openrdf.query.resultio.text.tsv.SPARQLResultsTSVWriterFactory;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFWriterFactory;
 import org.openrdf.rio.ntriples.NTriplesWriterFactory;
 import org.openrdf.rio.rdfjson.RDFJSONWriterFactory;
 import org.openrdf.rio.rdfxml.RDFXMLWriterFactory;
 import org.openrdf.rio.turtle.TurtleWriterFactory;
-import org.openrdf.sail.SailConnection;
-import org.openrdf.sail.SailException;
 
 public class SPARQLQuery extends AbstractSailsResource {
 	
 	private final List<Variant> queryResultVariants;
 	private final List<Variant> rdfResultVariants;
 	
-	public SPARQLQuery(SailConnection sc, ValueFactory vf) {
-		super(sc, vf);
+	public SPARQLQuery(RepositoryConnection conn) {
+		super(conn);
 		queryResultVariants = Variant.mediaTypes(
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_JSON),
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_XML),
@@ -95,7 +93,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 	}
 
 	@POST
-	@Consumes("application/sparql-query")
+	@Consumes(RDFMediaType.SPARQL_QUERY)
 	public Response queryPOSTDirect(
 			@Context Request req,
 			@Context UriInfo uriInfo,
@@ -113,13 +111,13 @@ public class SPARQLQuery extends AbstractSailsResource {
 			List<String> namedgraphs) {
 		try {
 			final CloseableIteration<? extends BindingSet, QueryEvaluationException> results;
-			final ParsedQuery query = QueryParserUtil.parseQuery(
+			final Query query = conn.prepareQuery(
 				QueryLanguage.SPARQL,
 				queryString,
 				uriInfo.getAbsolutePath().toASCIIString());
 			final List<Variant> acceptable;
 			boolean isGraphQuery = false;
-			if (query instanceof ParsedGraphQuery) {
+			if (query instanceof GraphQuery) {
 				acceptable = rdfResultVariants;
 				isGraphQuery = true;
 			} else {
@@ -131,22 +129,16 @@ public class SPARQLQuery extends AbstractSailsResource {
 			}
 			final MediaType mt = variant.getMediaType();
 			final String mtstr = mt.getType() + "/" + mt.getSubtype();
-			results = sc.evaluate(
-					query.getTupleExpr(),
-					query.getDataset(),
-					new EmptyBindingSet(),
-					false);
 			StreamingOutput stream;
 			if (isGraphQuery) {
+				GraphQuery gq = (GraphQuery) query;
 				stream = new SPARQLGraphStreamingOutput(
-					query,
-					results,
-					getRDFWriterFactory(mtstr),
-					vf);				
+					gq,
+					getRDFWriterFactory(mtstr));				
 			} else {
+				TupleQuery tq = (TupleQuery) query;
 				stream = new SPARQLResultStreamingOutput(
-					query,
-					results,
+					tq,
 					getResultWriterFactory(mtstr));
 			}
 			return Response.ok(stream).type(mt).build();
@@ -154,7 +146,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 			String str = ex.getMessage();
 			return Response.status(Response.Status.BAD_REQUEST).entity(
 					str.getBytes(Charset.forName("UTF-8"))).build();
-		} catch (SailException ex) {
+		} catch (RepositoryException ex) {
 			throw new WebApplicationException(ex);
 		}
     }
