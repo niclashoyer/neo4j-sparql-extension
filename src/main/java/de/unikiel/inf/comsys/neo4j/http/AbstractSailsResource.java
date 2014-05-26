@@ -2,11 +2,12 @@
 package de.unikiel.inf.comsys.neo4j.http;
 
 import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 
 public class AbstractSailsResource {
-	protected final SailConnection sc;
-	protected final ValueFactory vf;
+	protected final RepositoryConnection conn;
 	
 	protected static class Status {
 		public static final int NOT_IMPLEMENTED = 501;
@@ -25,8 +26,7 @@ public class AbstractSailsResource {
 		public static final String RDF_NTRIPLES = "application/n-triples";
 	}
 	
-	public AbstractSailsResource(SailConnection sc, ValueFactory vf) {
-		this.sc = sc;
-		this.vf = vf;
+	public AbstractSailsResource(RepositoryConnection conn) {
+		this.conn = conn;
 	}
 }

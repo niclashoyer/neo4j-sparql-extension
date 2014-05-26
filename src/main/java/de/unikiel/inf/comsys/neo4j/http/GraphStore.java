@@ -1,7 +1,6 @@
 
 package de.unikiel.inf.comsys.neo4j.http;
 
-import de.unikiel.inf.comsys.neo4j.rio.SailsRDFHandler;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import javax.ws.rs.Consumes;
@@ -15,14 +14,18 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import org.openrdf.model.Resource;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.turtle.TurtleParser;
-import org.openrdf.sail.SailConnection;
 
 public class GraphStore extends AbstractSailsResource {
 
-	public GraphStore(SailConnection sc, ValueFactory vf) {
-		super(sc, vf);
+	private final ValueFactory vf;
+	
+	public GraphStore(RepositoryConnection conn) {
+		super(conn);
+		this.vf = conn.getValueFactory();
 	}
 	
 	@GET
@@ -39,6 +42,7 @@ public class GraphStore extends AbstractSailsResource {
 			@QueryParam("default") String def,
 			InputStream in) {
 		try {
+			
 			RDFParser p = new TurtleParser();
 			Resource dctx = null;
 			String base = "http://example.com"; // FIXME
@@ -46,11 +50,8 @@ public class GraphStore extends AbstractSailsResource {
 				dctx = vf.createURI(graphString);
 				base = dctx.stringValue();
 			}
-			p.setRDFHandler(new SailsRDFHandler(sc, dctx));
-			p.parse(in, base);
-			String str = graphString + "\n" + def;
-			return Response.status(Response.Status.OK).entity(
-					str.getBytes(Charset.forName("UTF-8"))).build();
+			conn.add(in, base, RDFFormat.TURTLE, dctx);
+			return Response.status(Response.Status.OK).build();
 		} catch (Exception ex) {
 			// DEBUG
 			String str = ex.toString();

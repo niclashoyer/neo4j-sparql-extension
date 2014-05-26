@@ -8,13 +8,12 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.sail.SailConnection;
+import org.openrdf.repository.RepositoryConnection;
 
 public class SPARQLUpdate extends AbstractSailsResource {
 	
-	public SPARQLUpdate(SailConnection sc, ValueFactory vf) {
-		super(sc, vf);
+	public SPARQLUpdate(RepositoryConnection conn) {
+		super(conn);
 	}
 	
 	@POST
