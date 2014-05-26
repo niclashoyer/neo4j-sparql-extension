@@ -40,6 +40,12 @@
 			<groupId>com.tinkerpop.blueprints</groupId>
 			<artifactId>blueprints-neo4j2-graph</artifactId>
 			<version>${blueprints.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>json</artifactId>
+					<groupId>org.json</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.tinkerpop.blueprints</groupId>
@@ -125,12 +131,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-jaxrs</artifactId>
-            <version>${jackson.version}</version>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>${jackson.version}</version>
 			<scope>test</scope>
-        </dependency>
+		</dependency>
 		<dependency>
 			<artifactId>sesame-queryresultio-sparqlxml</artifactId>
 			<groupId>org.openrdf.sesame</groupId>
@@ -201,6 +207,26 @@
 						<format>xml</format>
 					</formats>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<configuration>
+							<licenseMerges>
+								<licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0|Apache License|Apache 2</licenseMerge>
+								<licenseMerge>New BSD License|BSD 3-Clause|BSD-like|Aduna BSD license</licenseMerge>
+								<licenseMerge>The MIT License|MIT License|Bouncy Castle License</licenseMerge>
+								<licenseMerge>GNU General Public License, Version 2|Dual license consisting of the CDDL v1.1 and GPL v2</licenseMerge>
+								<licenseMerge>GNU General Public License, Version 2 with ClassPath Exception|GPL2 w/ CPE</licenseMerge>
+							</licenseMerges>
+							<useMissingFile>true</useMissingFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
