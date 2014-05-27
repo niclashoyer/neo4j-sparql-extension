@@ -1,23 +1,34 @@
 
 package de.unikiel.inf.comsys.neo4j.http;
 
+import de.unikiel.inf.comsys.neo4j.http.streams.RDFStreamingOutput;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 import org.openrdf.model.Resource;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.turtle.TurtleParser;
+import org.openrdf.rio.RDFParseException;
 
 public class GraphStore extends AbstractSailsResource {
 
@@ -29,80 +40,178 @@ public class GraphStore extends AbstractSailsResource {
 	}
 	
 	@GET
+	@Produces({
+		RDFMediaType.RDF_TURTLE,
+		RDFMediaType.RDF_XML,
+		RDFMediaType.RDF_NTRIPLES,
+		RDFMediaType.RDF_JSON
+	})
 	public Response graphIndirectGet(
+			@Context Request req,
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def) {
-		return Response.status(Status.NOT_IMPLEMENTED).build();
+		return handleGet(req, def, graphString);
 	}
 	
 	@PUT
-	@Consumes("text/turtle")
+	@Consumes({
+		RDFMediaType.RDF_TURTLE,
+		RDFMediaType.RDF_XML,
+		RDFMediaType.RDF_NTRIPLES,
+		RDFMediaType.RDF_XML
+	})
 	public Response graphIndirectPut(
+			@Context UriInfo uriInfo,
+			@HeaderParam("Content-Type") MediaType type,
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
 			InputStream in) {
-		try {
-			
-			RDFParser p = new TurtleParser();
-			Resource dctx = null;
-			String base = "http://example.com"; // FIXME
-			if (graphString != null) {
-				dctx = vf.createURI(graphString);
-				base = dctx.stringValue();
-			}
-			conn.add(in, base, RDFFormat.TURTLE, dctx);
-			return Response.status(Response.Status.OK).build();
-		} catch (Exception ex) {
-			// DEBUG
-			String str = ex.toString();
-			return Response.status(500).entity(
-					str.getBytes(Charset.forName("UTF-8"))).build();
-		}
+		handleClear(graphString);
+		return handleAdd(uriInfo, type, graphString, def, in);
 	}
 	
 	@DELETE
 	public Response graphIndirectDelete(
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def) {
-		return Response.status(Status.NOT_IMPLEMENTED).build();
+		return handleClear(graphString);
 	}
 	
 	@POST
+	@Consumes({
+		RDFMediaType.RDF_TURTLE,
+		RDFMediaType.RDF_XML,
+		RDFMediaType.RDF_NTRIPLES,
+		RDFMediaType.RDF_XML
+	})
 	public Response graphIndirectPost(
+			@Context UriInfo uriInfo,
+			@HeaderParam("Content-Type") MediaType type,
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
 			InputStream in) {
-		return Response.status(Status.NOT_IMPLEMENTED).build();
+		return handleAdd(uriInfo, type, graphString, def, in);
 	}
 	
 	@GET
+	@Produces({
+		RDFMediaType.RDF_TURTLE,
+		RDFMediaType.RDF_XML,
+		RDFMediaType.RDF_NTRIPLES,
+		RDFMediaType.RDF_JSON
+	})
 	@Path("/{graph}")
 	public Response graphDirectGet(
+			@Context Request req,
+			@Context UriInfo uriInfo,
 			@PathParam("graph") String graphString) {
-		return Response.status(Status.NOT_IMPLEMENTED).build();
+		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		return handleGet(req, null, graphuri);
 	}
 	
 	@PUT
+	@Consumes({
+		RDFMediaType.RDF_TURTLE,
+		RDFMediaType.RDF_XML,
+		RDFMediaType.RDF_NTRIPLES,
+		RDFMediaType.RDF_XML
+	})
 	@Path("/{graph}")
 	public Response graphDirectPut(
-			@PathParam("graph") String graphString,
+			@Context UriInfo uriInfo,
+			@HeaderParam("Content-Type") MediaType type,
 			InputStream in) {
-		return Response.status(Status.NOT_IMPLEMENTED).build();
+		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		handleClear(graphuri);
+		return handleAdd(uriInfo, type, graphuri, null, in);
 	}
 	
 	@DELETE
 	@Path("/{graph}")
-	public Response graphDirectDelete(
-			@PathParam("graph") String graphString) {
-		return Response.status(Status.NOT_IMPLEMENTED).build();
+	public Response graphDirectDelete(@Context UriInfo uriInfo) {
+		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		return handleClear(graphuri);
 	}
 	
 	@POST
+	@Consumes({
+		RDFMediaType.RDF_TURTLE,
+		RDFMediaType.RDF_XML,
+		RDFMediaType.RDF_NTRIPLES,
+		RDFMediaType.RDF_XML
+	})
 	@Path("/{graph}")
 	public Response graphDirectPost(
-			@PathParam("graph") String graphString,
+			@Context UriInfo uriInfo,
+			@HeaderParam("Content-Type") MediaType type,
 			InputStream in) {
-		return Response.status(Status.NOT_IMPLEMENTED).build();
+			String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		return handleAdd(uriInfo, type, graphuri, null, in);
+	}
+	
+	private Response handleAdd(
+			UriInfo uriInfo,
+			MediaType type,
+			String graphString,
+			String def,
+			InputStream in) {
+		try {
+			Resource dctx = null;
+			String base = uriInfo.getAbsolutePath().toASCIIString();
+			if (graphString != null) {
+				dctx = vf.createURI(graphString);
+				base = dctx.stringValue();
+			}
+			String typestr = type.getType() + "/" + type.getSubtype();
+			RDFFormat format = getRDFFormat(typestr);
+			if (dctx != null) {
+				conn.add(in, base, format, dctx);
+			} else {
+				conn.add(in, base, format);
+			}
+			return Response.status(Response.Status.OK).build();
+		} catch (RDFParseException ex) {
+			String str = ex.getMessage();
+			return Response.status(400).entity(
+					str.getBytes(Charset.forName("UTF-8"))).build();
+		} catch(IOException | RepositoryException ex) {
+			throw new WebApplicationException(ex);
+		}
+	}
+	
+	private Response handleClear(String graphString) {
+		try {
+			if (graphString != null) {
+				Resource ctx = vf.createURI(graphString);
+				conn.clear(ctx);
+			} else {
+				conn.clear();
+			}
+		} catch (RepositoryException ex) {
+			throw new WebApplicationException(ex);
+		}
+		return Response.status(Response.Status.OK).build();
+	}
+	
+	private Response handleGet(
+			Request req,
+			String def,
+			String graphString) {
+		final Variant variant = req.selectVariant(rdfResultVariants);
+		if (variant == null) {
+			return Response.notAcceptable(rdfResultVariants).build();
+		}
+		final MediaType mt = variant.getMediaType();
+		final String mtstr = mt.getType() + "/" + mt.getSubtype();
+		final RDFFormat format = getRDFFormat(mtstr);
+		StreamingOutput stream;
+		if (graphString != null) {
+			Resource ctx = vf.createURI(graphString);
+			stream = new RDFStreamingOutput(conn, format, ctx);
+		} else {
+			stream = new RDFStreamingOutput(conn, format);
+		}
+		return Response.ok(stream).build();
 	}
 	
 }

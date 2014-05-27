@@ -3,7 +3,6 @@ package de.unikiel.inf.comsys.neo4j.http;
 
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLGraphStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLResultStreamingOutput;
-import info.aduna.iteration.CloseableIteration;
 import java.nio.charset.Charset;
 import java.util.List;
 import javax.ws.rs.Consumes;
@@ -20,11 +19,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
-import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.Query;
-import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
@@ -35,15 +32,12 @@ import org.openrdf.query.resultio.text.tsv.SPARQLResultsTSVWriterFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFWriterFactory;
-import org.openrdf.rio.ntriples.NTriplesWriterFactory;
-import org.openrdf.rio.rdfjson.RDFJSONWriterFactory;
-import org.openrdf.rio.rdfxml.RDFXMLWriterFactory;
-import org.openrdf.rio.turtle.TurtleWriterFactory;
+import org.openrdf.rio.RDFWriterRegistry;
 
 public class SPARQLQuery extends AbstractSailsResource {
 	
 	private final List<Variant> queryResultVariants;
-	private final List<Variant> rdfResultVariants;
+	private final RDFWriterRegistry registry;
 	
 	public SPARQLQuery(RepositoryConnection conn) {
 		super(conn);
@@ -53,12 +47,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_CSV),
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_TSV)
 		).add().build();
-		rdfResultVariants = Variant.mediaTypes(
-			MediaType.valueOf(RDFMediaType.RDF_TURTLE),
-			MediaType.valueOf(RDFMediaType.RDF_NTRIPLES),
-			MediaType.valueOf(RDFMediaType.RDF_XML),
-			MediaType.valueOf(RDFMediaType.RDF_JSON)
-		).add().build();
+		this.registry = RDFWriterRegistry.getInstance();
 	}
 	
     @GET
@@ -110,7 +99,6 @@ public class SPARQLQuery extends AbstractSailsResource {
 			List<String> defgraphs,
 			List<String> namedgraphs) {
 		try {
-			final CloseableIteration<? extends BindingSet, QueryEvaluationException> results;
 			final Query query = conn.prepareQuery(
 				QueryLanguage.SPARQL,
 				queryString,
@@ -130,11 +118,12 @@ public class SPARQLQuery extends AbstractSailsResource {
 			final MediaType mt = variant.getMediaType();
 			final String mtstr = mt.getType() + "/" + mt.getSubtype();
 			StreamingOutput stream;
+			RDFWriterFactory factory = registry.get(getRDFFormat(mtstr));
 			if (isGraphQuery) {
 				GraphQuery gq = (GraphQuery) query;
 				stream = new SPARQLGraphStreamingOutput(
 					gq,
-					getRDFWriterFactory(mtstr));				
+					factory);				
 			} else {
 				TupleQuery tq = (TupleQuery) query;
 				stream = new SPARQLResultStreamingOutput(
@@ -150,20 +139,6 @@ public class SPARQLQuery extends AbstractSailsResource {
 			throw new WebApplicationException(ex);
 		}
     }
-	
-	private RDFWriterFactory getRDFWriterFactory(String mimetype) {
-		switch (mimetype) {
-			default:
-			case RDFMediaType.RDF_TURTLE:
-				return new TurtleWriterFactory();
-			case RDFMediaType.RDF_NTRIPLES:
-				return new NTriplesWriterFactory();
-			case RDFMediaType.RDF_XML:
-				return new RDFXMLWriterFactory();
-			case RDFMediaType.RDF_JSON:
-				return new RDFJSONWriterFactory();
-		}
-	}
 	
 	private TupleQueryResultWriterFactory getResultWriterFactory(String mimetype) {
 		switch (mimetype) {

@@ -1,13 +1,16 @@
 
 package de.unikiel.inf.comsys.neo4j.http;
 
-import org.openrdf.model.ValueFactory;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Variant;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailConnection;
+import org.openrdf.rio.RDFFormat;
 
 public class AbstractSailsResource {
+	
 	protected final RepositoryConnection conn;
+	protected final List<Variant> rdfResultVariants;
 	
 	protected static class Status {
 		public static final int NOT_IMPLEMENTED = 501;
@@ -28,5 +31,25 @@ public class AbstractSailsResource {
 	
 	public AbstractSailsResource(RepositoryConnection conn) {
 		this.conn = conn;
+		rdfResultVariants = Variant.mediaTypes(
+			MediaType.valueOf(RDFMediaType.RDF_TURTLE),
+			MediaType.valueOf(RDFMediaType.RDF_NTRIPLES),
+			MediaType.valueOf(RDFMediaType.RDF_XML),
+			MediaType.valueOf(RDFMediaType.RDF_JSON)
+		).add().build();
+	}
+	
+	protected RDFFormat getRDFFormat(String mimetype) {
+		switch(mimetype) {
+			default:
+			case RDFMediaType.RDF_TURTLE:
+				return RDFFormat.TURTLE;
+			case RDFMediaType.RDF_XML:
+				return RDFFormat.RDFXML;
+			case RDFMediaType.RDF_NTRIPLES:
+				return RDFFormat.NTRIPLES;
+			case RDFMediaType.RDF_JSON:
+				return RDFFormat.RDFJSON;
+		}
 	}
 }
