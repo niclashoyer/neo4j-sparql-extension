@@ -31,10 +31,13 @@ import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriterFactory;
 import org.openrdf.query.resultio.text.tsv.SPARQLResultsTSVWriterFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFWriterFactory;
+import org.openrdf.rio.RDFWriterRegistry;
 
 public class SPARQLQuery extends AbstractSailsResource {
 	
 	private final List<Variant> queryResultVariants;
+	private final RDFWriterRegistry registry;
 	
 	public SPARQLQuery(RepositoryConnection conn) {
 		super(conn);
@@ -44,6 +47,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_CSV),
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_TSV)
 		).add().build();
+		this.registry = RDFWriterRegistry.getInstance();
 	}
 	
     @GET
@@ -114,11 +118,12 @@ public class SPARQLQuery extends AbstractSailsResource {
 			final MediaType mt = variant.getMediaType();
 			final String mtstr = mt.getType() + "/" + mt.getSubtype();
 			StreamingOutput stream;
+			RDFWriterFactory factory = registry.get(getRDFFormat(mtstr));
 			if (isGraphQuery) {
 				GraphQuery gq = (GraphQuery) query;
 				stream = new SPARQLGraphStreamingOutput(
 					gq,
-					getRDFWriterFactory(mtstr));				
+					factory);				
 			} else {
 				TupleQuery tq = (TupleQuery) query;
 				stream = new SPARQLResultStreamingOutput(

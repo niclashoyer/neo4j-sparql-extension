@@ -16,6 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -28,7 +29,6 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.RDFWriterFactory;
 
 public class GraphStore extends AbstractSailsResource {
 
@@ -47,7 +47,7 @@ public class GraphStore extends AbstractSailsResource {
 		RDFMediaType.RDF_JSON
 	})
 	public Response graphIndirectGet(
-			Request req,
+			@Context Request req,
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def) {
 		return handleGet(req, def, graphString);
@@ -61,7 +61,7 @@ public class GraphStore extends AbstractSailsResource {
 		RDFMediaType.RDF_XML
 	})
 	public Response graphIndirectPut(
-			UriInfo uriInfo,
+			@Context UriInfo uriInfo,
 			@HeaderParam("Content-Type") MediaType type,
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
@@ -85,7 +85,7 @@ public class GraphStore extends AbstractSailsResource {
 		RDFMediaType.RDF_XML
 	})
 	public Response graphIndirectPost(
-			UriInfo uriInfo,
+			@Context UriInfo uriInfo,
 			@HeaderParam("Content-Type") MediaType type,
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
@@ -102,9 +102,11 @@ public class GraphStore extends AbstractSailsResource {
 	})
 	@Path("/{graph}")
 	public Response graphDirectGet(
-			Request req,
+			@Context Request req,
+			@Context UriInfo uriInfo,
 			@PathParam("graph") String graphString) {
-		return handleGet(req, null, graphString);
+		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		return handleGet(req, null, graphuri);
 	}
 	
 	@PUT
@@ -116,20 +118,19 @@ public class GraphStore extends AbstractSailsResource {
 	})
 	@Path("/{graph}")
 	public Response graphDirectPut(
-			UriInfo uriInfo,
+			@Context UriInfo uriInfo,
 			@HeaderParam("Content-Type") MediaType type,
-			@PathParam("graph") String graphString,
 			InputStream in) {
-		String def = uriInfo.getAbsolutePath().toASCIIString();
-		handleClear(graphString);
-		return handleAdd(uriInfo, type, graphString, def, in);
+		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		handleClear(graphuri);
+		return handleAdd(uriInfo, type, graphuri, null, in);
 	}
 	
 	@DELETE
 	@Path("/{graph}")
-	public Response graphDirectDelete(
-			@PathParam("graph") String graphString) {
-		return handleClear(graphString);
+	public Response graphDirectDelete(@Context UriInfo uriInfo) {
+		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		return handleClear(graphuri);
 	}
 	
 	@POST
@@ -141,11 +142,11 @@ public class GraphStore extends AbstractSailsResource {
 	})
 	@Path("/{graph}")
 	public Response graphDirectPost(
-			UriInfo uriInfo,
+			@Context UriInfo uriInfo,
 			@HeaderParam("Content-Type") MediaType type,
-			@PathParam("graph") String graphString,
 			InputStream in) {
-		return handleAdd(uriInfo, type, graphString, null, in);
+			String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		return handleAdd(uriInfo, type, graphuri, null, in);
 	}
 	
 	private Response handleAdd(
@@ -192,7 +193,7 @@ public class GraphStore extends AbstractSailsResource {
 		return Response.status(Response.Status.OK).build();
 	}
 	
-	public Response handleGet(
+	private Response handleGet(
 			Request req,
 			String def,
 			String graphString) {
@@ -202,29 +203,15 @@ public class GraphStore extends AbstractSailsResource {
 		}
 		final MediaType mt = variant.getMediaType();
 		final String mtstr = mt.getType() + "/" + mt.getSubtype();
-		final RDFWriterFactory factory = getRDFWriterFactory(mtstr);
+		final RDFFormat format = getRDFFormat(mtstr);
 		StreamingOutput stream;
 		if (graphString != null) {
 			Resource ctx = vf.createURI(graphString);
-			stream = new RDFStreamingOutput(conn, factory, ctx);
+			stream = new RDFStreamingOutput(conn, format, ctx);
 		} else {
-			stream = new RDFStreamingOutput(conn, factory);
+			stream = new RDFStreamingOutput(conn, format);
 		}
 		return Response.ok(stream).build();
-	}
-	
-	private RDFFormat getRDFFormat(String mimetype) {
-		switch(mimetype) {
-			default:
-			case RDFMediaType.RDF_TURTLE:
-				return RDFFormat.TURTLE;
-			case RDFMediaType.RDF_XML:
-				return RDFFormat.RDFXML;
-			case RDFMediaType.RDF_NTRIPLES:
-				return RDFFormat.NTRIPLES;
-			case RDFMediaType.RDF_JSON:
-				return RDFFormat.RDFJSON;
-		}
 	}
 	
 }

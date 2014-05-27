@@ -7,9 +7,11 @@ import javax.ws.rs.core.StreamingOutput;
 import org.openrdf.model.Resource;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.RDFWriterFactory;
+import org.openrdf.rio.RDFWriterRegistry;
 
 public class RDFStreamingOutput implements StreamingOutput {
 
@@ -19,11 +21,11 @@ public class RDFStreamingOutput implements StreamingOutput {
 
 	public RDFStreamingOutput(
 			RepositoryConnection conn,
-			RDFWriterFactory writerFactory,
+			RDFFormat format,
 			Resource... contexts) {
-		this.conn = conn;
-		this.factory = writerFactory;
+		this.conn     = conn;
 		this.contexts = contexts;
+		this.factory  = RDFWriterRegistry.getInstance().get(format);
 	}
 
 	@Override

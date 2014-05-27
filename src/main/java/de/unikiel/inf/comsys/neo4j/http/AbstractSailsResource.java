@@ -5,11 +5,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.RDFWriterFactory;
-import org.openrdf.rio.ntriples.NTriplesWriterFactory;
-import org.openrdf.rio.rdfjson.RDFJSONWriterFactory;
-import org.openrdf.rio.rdfxml.RDFXMLWriterFactory;
-import org.openrdf.rio.turtle.TurtleWriterFactory;
+import org.openrdf.rio.RDFFormat;
 
 public class AbstractSailsResource {
 	
@@ -43,17 +39,17 @@ public class AbstractSailsResource {
 		).add().build();
 	}
 	
-	protected RDFWriterFactory getRDFWriterFactory(String mimetype) {
-		switch (mimetype) {
+	protected RDFFormat getRDFFormat(String mimetype) {
+		switch(mimetype) {
 			default:
 			case RDFMediaType.RDF_TURTLE:
-				return new TurtleWriterFactory();
-			case RDFMediaType.RDF_NTRIPLES:
-				return new NTriplesWriterFactory();
+				return RDFFormat.TURTLE;
 			case RDFMediaType.RDF_XML:
-				return new RDFXMLWriterFactory();
+				return RDFFormat.RDFXML;
+			case RDFMediaType.RDF_NTRIPLES:
+				return RDFFormat.NTRIPLES;
 			case RDFMediaType.RDF_JSON:
-				return new RDFJSONWriterFactory();
+				return RDFFormat.RDFJSON;
 		}
 	}
 }
