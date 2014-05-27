@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.impls.neo4j2.Neo4j2Graph;
 import com.tinkerpop.blueprints.oupls.sail.GraphSail;
 import de.unikiel.inf.comsys.neo4j.http.GraphStore;
 import de.unikiel.inf.comsys.neo4j.http.SPARQLQuery;
+import de.unikiel.inf.comsys.neo4j.http.SPARQLUpdate;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -31,6 +32,7 @@ public class RDFServerExtension {
 	
     private final GraphDatabaseService database;
 	private final SPARQLQuery query;
+	private final SPARQLUpdate update;
 	private final GraphStore graphStore;
 
     public RDFServerExtension(@Context GraphDatabaseService database) throws SailException, RepositoryException {
@@ -42,6 +44,7 @@ public class RDFServerExtension {
 		rep.initialize();
 		RepositoryConnection conn = rep.getConnection();
 		query = new SPARQLQuery(conn);
+		update = new SPARQLUpdate(conn);
 		graphStore = new GraphStore(conn);
     }
 	
@@ -62,15 +65,20 @@ public class RDFServerExtension {
 		writerRegistry.add(new NTriplesWriterFactory());
 		writerRegistry.add(new RDFJSONWriterFactory());
 	}
-
-	@Path("/graph")
-	public GraphStore graph() {
-			return graphStore;
-	}
 	
     @Path("/query")
     public SPARQLQuery query() {
 		return query;
     }
+	
+	@Path("/update")
+	public SPARQLUpdate update() {
+			return update;
+	}
+	
+	@Path("/graph")
+	public GraphStore graph() {
+			return graphStore;
+	}
 	
 }
