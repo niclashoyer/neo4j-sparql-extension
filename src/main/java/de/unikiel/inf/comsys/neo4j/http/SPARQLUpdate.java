@@ -47,7 +47,9 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			List<String> namedgraphs) {
 		try {
 			Update update = conn.prepareUpdate(QueryLanguage.SPARQL, query);
+			conn.begin();
 			update.execute();
+			conn.commit();
 			return Response.ok().build();
 		} catch (MalformedQueryException ex) {
 			String str = ex.getMessage();
