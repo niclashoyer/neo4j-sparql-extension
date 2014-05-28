@@ -66,8 +66,7 @@ public class GraphStore extends AbstractSailsResource {
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
 			InputStream in) {
-		handleClear(graphString);
-		return handleAdd(uriInfo, type, graphString, def, in);
+		return handleAdd(uriInfo, type, graphString, def, in, true);
 	}
 	
 	@DELETE
@@ -90,7 +89,7 @@ public class GraphStore extends AbstractSailsResource {
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
 			InputStream in) {
-		return handleAdd(uriInfo, type, graphString, def, in);
+		return handleAdd(uriInfo, type, graphString, def, in, false);
 	}
 	
 	@GET
@@ -122,8 +121,7 @@ public class GraphStore extends AbstractSailsResource {
 			@HeaderParam("Content-Type") MediaType type,
 			InputStream in) {
 		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
-		handleClear(graphuri);
-		return handleAdd(uriInfo, type, graphuri, null, in);
+		return handleAdd(uriInfo, type, graphuri, null, in, true);
 	}
 	
 	@DELETE
@@ -146,7 +144,7 @@ public class GraphStore extends AbstractSailsResource {
 			@HeaderParam("Content-Type") MediaType type,
 			InputStream in) {
 			String graphuri = uriInfo.getAbsolutePath().toASCIIString();
-		return handleAdd(uriInfo, type, graphuri, null, in);
+		return handleAdd(uriInfo, type, graphuri, null, in, false);
 	}
 	
 	private Response handleAdd(
@@ -154,7 +152,8 @@ public class GraphStore extends AbstractSailsResource {
 			MediaType type,
 			String graphString,
 			String def,
-			InputStream in) {
+			InputStream in,
+			boolean clear) {
 		try {
 			Resource dctx = null;
 			String base = uriInfo.getAbsolutePath().toASCIIString();
@@ -164,11 +163,19 @@ public class GraphStore extends AbstractSailsResource {
 			}
 			String typestr = type.getType() + "/" + type.getSubtype();
 			RDFFormat format = getRDFFormat(typestr);
+			conn.begin();
 			if (dctx != null) {
+				if (clear) {
+					conn.clear(dctx);
+				}
 				conn.add(in, base, format, dctx);
 			} else {
+				if (clear) {
+					conn.clear();
+				}
 				conn.add(in, base, format);
 			}
+			conn.commit();
 			return Response.status(Response.Status.OK).build();
 		} catch (RDFParseException ex) {
 			String str = ex.getMessage();
@@ -181,12 +188,14 @@ public class GraphStore extends AbstractSailsResource {
 	
 	private Response handleClear(String graphString) {
 		try {
+			conn.begin();
 			if (graphString != null) {
 				Resource ctx = vf.createURI(graphString);
 				conn.clear(ctx);
 			} else {
 				conn.clear();
 			}
+			conn.commit();
 		} catch (RepositoryException ex) {
 			throw new WebApplicationException(ex);
 		}
