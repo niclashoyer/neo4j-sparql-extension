@@ -14,13 +14,13 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.Update;
 import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 
 public class SPARQLUpdate extends AbstractSailsResource {
 	
-	public SPARQLUpdate(RepositoryConnection conn) {
-		super(conn);
+	public SPARQLUpdate(Repository rep) {
+		super(rep);
 	}
 	
 	@POST
@@ -45,10 +45,13 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			String query,
 			List<String> defgraphs,
 			List<String> namedgraphs) {
-		try {
+		try (CloseableRepositoryConnection conn = getConnection()) {
 			Update update = conn.prepareUpdate(QueryLanguage.SPARQL, query);
+			System.out.println("[BEGIN] Update transaction begin");
 			conn.begin();
+			System.out.println("[EXEC] Update execution");
 			update.execute();
+			System.out.println("[COMMIT] Update transaction commit");
 			conn.commit();
 			return Response.ok().build();
 		} catch (MalformedQueryException ex) {

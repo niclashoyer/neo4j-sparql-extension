@@ -9,9 +9,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <neo4j.version>2.0.3</neo4j.version>
-        <blueprints.version>2.5.0</blueprints.version>
-        <sesame.version>2.7.10</sesame.version>
+        <neo4j.version>2.1.1</neo4j.version>
+        <blueprints.version>2.6.0-SNAPSHOT</blueprints.version>
+        <sesame.version>2.7.11</sesame.version>
         <junit.version>4.11</junit.version>
         <jersey.version>1.9</jersey.version>
         <jackson.version>1.9.13</jackson.version>
@@ -35,18 +35,19 @@
             </comments>
         </license>
     </licenses>
+    <repositories>
+        <repository>
+            <id>sonatype-oss-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <dependencies>
-        <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
-            <artifactId>blueprints-neo4j2-graph</artifactId>
-            <version>${blueprints.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>json</artifactId>
-                    <groupId>org.json</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-graph-sail</artifactId>
@@ -167,6 +168,12 @@
             <artifactId>javax.ws.rs-api</artifactId>
             <version>2.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-neo4j2-graph</artifactId>
+            <version>${blueprints.version}</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>

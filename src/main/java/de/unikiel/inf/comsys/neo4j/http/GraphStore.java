@@ -25,6 +25,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 import org.openrdf.model.Resource;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
@@ -34,9 +35,9 @@ public class GraphStore extends AbstractSailsResource {
 
 	private final ValueFactory vf;
 	
-	public GraphStore(RepositoryConnection conn) {
-		super(conn);
-		this.vf = conn.getValueFactory();
+	public GraphStore(Repository rep) {
+		super(rep);
+		this.vf = rep.getValueFactory();
 	}
 	
 	@GET
@@ -154,7 +155,7 @@ public class GraphStore extends AbstractSailsResource {
 			String def,
 			InputStream in,
 			boolean clear) {
-		try {
+		try (CloseableRepositoryConnection conn = getConnection()) {
 			Resource dctx = null;
 			String base = uriInfo.getAbsolutePath().toASCIIString();
 			if (graphString != null) {
@@ -187,7 +188,7 @@ public class GraphStore extends AbstractSailsResource {
 	}
 	
 	private Response handleClear(String graphString) {
-		try {
+		try (CloseableRepositoryConnection conn = getConnection()) {
 			conn.begin();
 			if (graphString != null) {
 				Resource ctx = vf.createURI(graphString);
@@ -214,11 +215,18 @@ public class GraphStore extends AbstractSailsResource {
 		final String mtstr = mt.getType() + "/" + mt.getSubtype();
 		final RDFFormat format = getRDFFormat(mtstr);
 		StreamingOutput stream;
-		if (graphString != null) {
-			Resource ctx = vf.createURI(graphString);
-			stream = new RDFStreamingOutput(conn, format, ctx);
-		} else {
-			stream = new RDFStreamingOutput(conn, format);
+		RepositoryConnection conn = null;
+		try {
+			conn = getConnection();
+			if (graphString != null) {
+				Resource ctx = vf.createURI(graphString);
+				stream = new RDFStreamingOutput(conn, format, ctx);
+			} else {
+				stream = new RDFStreamingOutput(conn, format);
+			}
+		} catch (RepositoryException ex) {
+			close(conn, ex);
+			throw new WebApplicationException(ex);
 		}
 		return Response.ok(stream).build();
 	}

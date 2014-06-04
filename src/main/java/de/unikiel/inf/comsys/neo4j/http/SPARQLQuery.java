@@ -29,6 +29,7 @@ import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriterFactory;
 import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriterFactory;
 import org.openrdf.query.resultio.text.tsv.SPARQLResultsTSVWriterFactory;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFWriterFactory;
@@ -39,8 +40,8 @@ public class SPARQLQuery extends AbstractSailsResource {
 	private final List<Variant> queryResultVariants;
 	private final RDFWriterRegistry registry;
 	
-	public SPARQLQuery(RepositoryConnection conn) {
-		super(conn);
+	public SPARQLQuery(Repository rep) {
+		super(rep);
 		queryResultVariants = Variant.mediaTypes(
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_JSON),
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_XML),
@@ -86,8 +87,8 @@ public class SPARQLQuery extends AbstractSailsResource {
 	public Response queryPOSTDirect(
 			@Context Request req,
 			@Context UriInfo uriInfo,
-			@FormParam("default-graph-uri") List<String> defgraphs,
-			@FormParam("named-graph-uri") List<String> namedgraphs,
+			@QueryParam("default-graph-uri") List<String> defgraphs,
+			@QueryParam("named-graph-uri") List<String> namedgraphs,
 			String queryString) {
 		return handleQuery(req, uriInfo, queryString, defgraphs, namedgraphs);
 	}
@@ -98,11 +99,14 @@ public class SPARQLQuery extends AbstractSailsResource {
 			String queryString,
 			List<String> defgraphs,
 			List<String> namedgraphs) {
+		RepositoryConnection conn = null;
 		try {
+			conn = getConnection();
 			final Query query = conn.prepareQuery(
 				QueryLanguage.SPARQL,
 				queryString,
 				uriInfo.getAbsolutePath().toASCIIString());
+			query.setMaxQueryTime(5); // FIXME: max query time as parameter
 			final List<Variant> acceptable;
 			boolean isGraphQuery = false;
 			if (query instanceof GraphQuery) {
@@ -121,21 +125,22 @@ public class SPARQLQuery extends AbstractSailsResource {
 			RDFWriterFactory factory = registry.get(getRDFFormat(mtstr));
 			if (isGraphQuery) {
 				GraphQuery gq = (GraphQuery) query;
-				stream = new SPARQLGraphStreamingOutput(
-					gq,
-					factory);				
+				stream = new SPARQLGraphStreamingOutput(gq, factory, conn);				
 			} else {
 				TupleQuery tq = (TupleQuery) query;
 				stream = new SPARQLResultStreamingOutput(
 					tq,
-					getResultWriterFactory(mtstr));
+					getResultWriterFactory(mtstr),
+					conn);
 			}
 			return Response.ok(stream).type(mt).build();
 		} catch (MalformedQueryException ex) {
+			close(conn, ex);
 			String str = ex.getMessage();
 			return Response.status(Response.Status.BAD_REQUEST).entity(
 					str.getBytes(Charset.forName("UTF-8"))).build();
 		} catch (RepositoryException ex) {
+			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}
     }
