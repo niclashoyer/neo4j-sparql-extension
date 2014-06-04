@@ -4,10 +4,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.neo4j2.Neo4j2Graph;
 import com.tinkerpop.blueprints.oupls.sail.GraphSail;
-import de.unikiel.inf.comsys.neo4j.http.GraphStore;
-import de.unikiel.inf.comsys.neo4j.http.SPARQLQuery;
-import de.unikiel.inf.comsys.neo4j.http.SPARQLUpdate;
-import javax.ws.rs.core.Context;
+import java.util.WeakHashMap;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
@@ -26,10 +23,13 @@ import org.openrdf.sail.Sail;
 
 public class RepositoryRegistry {
 	
-    private static RepositoryRegistry INSTANCE = null;
+	private static final WeakHashMap<GraphDatabaseService, RepositoryRegistry>
+		map = new WeakHashMap<>();
+	private static boolean rioInitialized = false;
 	private final Repository rep;
  
-    private RepositoryRegistry(GraphDatabaseService database) throws RepositoryException {
+    private RepositoryRegistry(GraphDatabaseService database)
+			throws RepositoryException {
 		initRio();
 		Graph graph = new Neo4j2Graph(database);
 		Sail sail = new GraphSail((KeyIndexableGraph) graph);
@@ -40,10 +40,14 @@ public class RepositoryRegistry {
  
     public static synchronized RepositoryRegistry getInstance(
 		GraphDatabaseService database) throws RepositoryException {
-        if (INSTANCE == null) {
-            INSTANCE = new RepositoryRegistry(database);
-        }
-        return INSTANCE;
+		RepositoryRegistry inst;
+        if (!map.containsKey(database)) {
+			inst = new RepositoryRegistry(database);
+			map.put(database, inst);
+        } else {
+			inst = map.get(database);
+		}
+        return inst;
     }
 	
 	public Repository getRepository() {
@@ -55,16 +59,19 @@ public class RepositoryRegistry {
 	 * Factories automatically when the jar gets deployed as plugin
 	 * inside the Neo4j Server.
 	 */
-	private void initRio() {
-		RDFParserRegistry parserRegistry = RDFParserRegistry.getInstance();
-		parserRegistry.add(new TurtleParserFactory());
-		parserRegistry.add(new RDFXMLParserFactory());
-		parserRegistry.add(new NTriplesParserFactory());
-		parserRegistry.add(new RDFJSONParserFactory());
-		RDFWriterRegistry writerRegistry = RDFWriterRegistry.getInstance();
-		writerRegistry.add(new TurtleWriterFactory());
-		writerRegistry.add(new RDFXMLWriterFactory());
-		writerRegistry.add(new NTriplesWriterFactory());
-		writerRegistry.add(new RDFJSONWriterFactory());
+	private synchronized void initRio() {
+		if (!rioInitialized) {
+			RDFParserRegistry parserRegistry = RDFParserRegistry.getInstance();
+			parserRegistry.add(new TurtleParserFactory());
+			parserRegistry.add(new RDFXMLParserFactory());
+			parserRegistry.add(new NTriplesParserFactory());
+			parserRegistry.add(new RDFJSONParserFactory());
+			RDFWriterRegistry writerRegistry = RDFWriterRegistry.getInstance();
+			writerRegistry.add(new TurtleWriterFactory());
+			writerRegistry.add(new RDFXMLWriterFactory());
+			writerRegistry.add(new NTriplesWriterFactory());
+			writerRegistry.add(new RDFJSONWriterFactory());
+			rioInitialized = true;
+		}
 	}
 }

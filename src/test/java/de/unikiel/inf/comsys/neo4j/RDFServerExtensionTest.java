@@ -12,24 +12,33 @@ import org.junit.BeforeClass;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 
 public class RDFServerExtensionTest {
 	protected static CommunityNeoServer server;
-	protected static GraphDatabaseService db;
+	protected static RepositoryConnection conn;
 
 	@BeforeClass
-	public static void setUp() throws IOException {
+	public static void setUp() throws IOException, RepositoryException {
 		int port;
 		try (final ServerSocket serverSocket = new ServerSocket(0)) {
 			port = serverSocket.getLocalPort();
 		}
-		server = CommunityServerBuilder.server().onPort(port).withThirdPartyJaxRsPackage("de.unikiel.inf.comsys.neo4j", "/rdf").build();
+		server = CommunityServerBuilder.server()
+			.onPort(port)
+			.withThirdPartyJaxRsPackage("de.unikiel.inf.comsys.neo4j", "/rdf")
+			.build();
 		server.start();
-		db = server.getDatabase().getGraph();
+		GraphDatabaseService db = server.getDatabase().getGraph();
+		Repository rep = RepositoryRegistry.getInstance(db).getRepository();
+		conn = rep.getConnection();
 	}
 
 	@AfterClass
-	public static void tearDown() {
+	public static void tearDown() throws RepositoryException {
+		conn.close();
 		server.stop();
 	}
 
