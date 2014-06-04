@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import org.eclipse.jetty.io.EofException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryInterruptedException;
 import org.openrdf.query.QueryResultHandlerException;
@@ -40,7 +41,6 @@ public class SPARQLResultStreamingOutput extends AbstractStreamingOutput {
 				conn.commit();
 				conn.close();
 			} catch (QueryInterruptedException ex) {
-				rollback(conn, ex);
 				close(conn, ex);
 				Response res = Response
 						.status(Response.Status.SERVICE_UNAVAILABLE)
@@ -52,7 +52,14 @@ public class SPARQLResultStreamingOutput extends AbstractStreamingOutput {
 					 QueryEvaluationException |
 					 QueryResultHandlerException ex) {
 				close(conn, ex);
-				throw new WebApplicationException(ex);
+				Throwable cause = ex.getCause();
+				// An EofException occurs, if the client closes the connection
+				// while we are streaming the response. If the client is not
+				// interested in the response, we should just close the
+				// connection.
+				if (!(cause instanceof EofException)) {
+					throw new WebApplicationException(ex);
+				}
 			}
 	}
 	
