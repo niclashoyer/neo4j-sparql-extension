@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.ServerSocket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.AfterClass;
@@ -47,6 +49,10 @@ public class RDFServerExtensionTest {
 
 	@AfterClass
 	public static void tearDown() throws RepositoryException {
+		try {
+			Thread.sleep(3000l);
+		} catch (InterruptedException ex) {
+		}
 		conn.close();
 		server.stop();
 	}
@@ -76,4 +82,7 @@ public class RDFServerExtensionTest {
 		return JsonPath.read(path, json, clazz);
 	}
 	
+	protected String getType(ClientResponse res) {
+		return res.getType().getType() + "/" + res.getType().getSubtype();
+	}
 }
