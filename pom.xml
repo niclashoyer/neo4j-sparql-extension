@@ -10,7 +10,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <neo4j.version>2.1.1</neo4j.version>
-        <blueprints.version>2.5.0</blueprints.version>
+        <blueprints.version>2.6.0-SNAPSHOT</blueprints.version>
         <sesame.version>2.7.10</sesame.version>
         <junit.version>4.11</junit.version>
         <jersey.version>1.9</jersey.version>
@@ -35,6 +35,18 @@
             </comments>
         </license>
     </licenses>
+    <repositories>
+        <repository>
+            <id>sonatype-oss-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
@@ -160,7 +172,8 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j2-graph</artifactId>
-            <version>2.6.0-SNAPSHOT</version>
+            <version>${blueprints.version}</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
