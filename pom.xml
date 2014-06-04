@@ -13,7 +13,7 @@
         <blueprints.version>2.6.0-SNAPSHOT</blueprints.version>
         <sesame.version>2.7.11</sesame.version>
         <junit.version>4.11</junit.version>
-        <jersey.version>1.18.1</jersey.version>
+        <jersey.version>1.9</jersey.version>
         <jackson.version>1.9.13</jackson.version>
     </properties>
     <licenses>
