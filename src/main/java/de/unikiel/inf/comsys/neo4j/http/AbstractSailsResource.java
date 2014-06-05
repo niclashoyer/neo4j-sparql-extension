@@ -9,7 +9,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 
-public class AbstractSailsResource {
+public abstract class AbstractSailsResource {
 	
 	protected final Repository rep;
 	protected final List<Variant> rdfResultVariants;

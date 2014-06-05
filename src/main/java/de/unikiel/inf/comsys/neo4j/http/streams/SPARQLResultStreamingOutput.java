@@ -3,8 +3,6 @@ package de.unikiel.inf.comsys.neo4j.http.streams;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import org.eclipse.jetty.io.EofException;
