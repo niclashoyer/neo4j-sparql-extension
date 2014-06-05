@@ -34,7 +34,6 @@ public class RepositoryRegistry {
 		Graph graph = new Neo4j2Graph(database);
 		Sail sail = new GraphSail((KeyIndexableGraph) graph);
 		this.rep = new SailRepository(sail);
-		System.out.println("[NEW] New repository initialized");
 		rep.initialize();
 	}
  

@@ -10,6 +10,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.log4j.Logger;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.Update;
@@ -18,6 +19,8 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 
 public class SPARQLUpdate extends AbstractSailsResource {
+	
+	private final Logger logger = Logger.getRootLogger();
 	
 	public SPARQLUpdate(Repository rep) {
 		super(rep);
@@ -46,12 +49,15 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			List<String> defgraphs,
 			List<String> namedgraphs) {
 		try (CloseableRepositoryConnection conn = getConnection()) {
+			if (query == null) {
+				throw new MalformedQueryException("empty query");
+			}
 			Update update = conn.prepareUpdate(QueryLanguage.SPARQL, query);
-			System.out.println("[BEGIN] Update transaction begin");
+			logger.debug("[BEGIN] Update transaction begin");
 			conn.begin();
-			System.out.println("[EXEC] Update execution");
+			logger.debug("[EXEC] Update execution");
 			update.execute();
-			System.out.println("[COMMIT] Update transaction commit");
+			logger.debug("[COMMIT] Update transaction commit");
 			conn.commit();
 			return Response.ok().build();
 		} catch (MalformedQueryException ex) {

@@ -101,6 +101,9 @@ public class SPARQLQuery extends AbstractSailsResource {
 			List<String> namedgraphs) {
 		RepositoryConnection conn = null;
 		try {
+			if (queryString == null) {
+				throw new MalformedQueryException("Missing query parameter");
+			}
 			conn = getConnection();
 			final Query query = conn.prepareQuery(
 				QueryLanguage.SPARQL,

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
+import org.apache.log4j.Logger;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -35,9 +36,10 @@ public class CloseableRepositoryConnection implements
 	RepositoryConnection, AutoCloseable {
 	
 	private final RepositoryConnection conn;
+	private final Logger logger = Logger.getRootLogger();
 	
 	public CloseableRepositoryConnection(RepositoryConnection conn) {
-		System.out.println("[NEW] RepositoryConnection (" + conn.hashCode() + ")");
+		logger.debug("[NEW] RepositoryConnection (" + conn.hashCode() + ")");
 		this.conn = conn;
 	}
 
@@ -69,11 +71,11 @@ public class CloseableRepositoryConnection implements
 	@Override
 	public void close() throws RepositoryException {
 		if (isActive()) {
-			System.out.println("[CLOSED ROLLBACK] RepositoryConnection rolled back (" + conn.hashCode() + ")");
+			logger.debug("[CLOSED ROLLBACK] RepositoryConnection rolled back (" + conn.hashCode() + ")");
 			conn.rollback();
 		}
 		if (isOpen()) {
-			System.out.println("[CLOSED] RepositoryConnection closed (" + conn.hashCode() + ")");
+			logger.debug("[CLOSED] RepositoryConnection closed (" + conn.hashCode() + ")");
 			conn.close();
 		}
 	}
@@ -185,19 +187,19 @@ public class CloseableRepositoryConnection implements
 
 	@Override
 	public void begin() throws RepositoryException {
-		System.out.println("[BEGIN] Begin transaction (" + conn.hashCode() + ")");
+		logger.debug("[BEGIN] Begin transaction (" + conn.hashCode() + ")");
 		conn.begin();
 	}
 
 	@Override
 	public void commit() throws RepositoryException {
-		System.out.println("[COMMIT] Commit transaction (" + conn.hashCode() + ")");
+		logger.debug("[COMMIT] Commit transaction (" + conn.hashCode() + ")");
 		conn.commit();
 	}
 
 	@Override
 	public void rollback() throws RepositoryException {
-		System.out.println("[ROLLBACK] Commit rollback (" + conn.hashCode() + ")");
+		logger.debug("[ROLLBACK] Commit rollback (" + conn.hashCode() + ")");
 		conn.rollback();
 	}
 
