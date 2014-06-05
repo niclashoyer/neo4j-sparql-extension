@@ -162,6 +162,9 @@ public class GraphStore extends AbstractSailsResource {
 				dctx = vf.createURI(graphString);
 				base = dctx.stringValue();
 			}
+			if (type == null) {
+				return Response.status(Response.Status.BAD_REQUEST).build();
+			}
 			String typestr = type.getType() + "/" + type.getSubtype();
 			RDFFormat format = getRDFFormat(typestr);
 			conn.begin();
@@ -177,7 +180,7 @@ public class GraphStore extends AbstractSailsResource {
 				conn.add(in, base, format);
 			}
 			conn.commit();
-			return Response.status(Response.Status.OK).build();
+			return Response.noContent().build();
 		} catch (RDFParseException ex) {
 			String str = ex.getMessage();
 			return Response.status(400).entity(
@@ -200,7 +203,7 @@ public class GraphStore extends AbstractSailsResource {
 		} catch (RepositoryException ex) {
 			throw new WebApplicationException(ex);
 		}
-		return Response.status(Response.Status.OK).build();
+		return Response.noContent().build();
 	}
 	
 	private Response handleGet(
@@ -208,9 +211,6 @@ public class GraphStore extends AbstractSailsResource {
 			String def,
 			String graphString) {
 		final Variant variant = req.selectVariant(rdfResultVariants);
-		if (variant == null) {
-			return Response.notAcceptable(rdfResultVariants).build();
-		}
 		final MediaType mt = variant.getMediaType();
 		final String mtstr = mt.getType() + "/" + mt.getSubtype();
 		final RDFFormat format = getRDFFormat(mtstr);
@@ -220,6 +220,9 @@ public class GraphStore extends AbstractSailsResource {
 			conn = getConnection();
 			if (graphString != null) {
 				Resource ctx = vf.createURI(graphString);
+				if (conn.size(ctx) == 0) {
+					return Response.status(Response.Status.NOT_FOUND).build();
+				}
 				stream = new RDFStreamingOutput(conn, format, ctx);
 			} else {
 				stream = new RDFStreamingOutput(conn, format);

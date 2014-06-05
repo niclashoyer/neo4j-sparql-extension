@@ -14,10 +14,6 @@ public class AbstractSailsResource {
 	protected final Repository rep;
 	protected final List<Variant> rdfResultVariants;
 	
-	protected static class Status {
-		public static final int NOT_IMPLEMENTED = 501;
-	}
-	
 	public AbstractSailsResource(Repository rep) {
 		this.rep = rep;
 		rdfResultVariants = Variant.mediaTypes(
