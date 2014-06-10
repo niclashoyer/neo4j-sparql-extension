@@ -3,6 +3,8 @@ package de.unikiel.inf.comsys.neo4j.http;
 
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -10,7 +12,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.Update;
@@ -20,7 +21,7 @@ import org.openrdf.repository.RepositoryException;
 
 public class SPARQLUpdate extends AbstractSailsResource {
 	
-	private final Logger logger = Logger.getRootLogger();
+	private static final Logger logger = Logger.getLogger(SPARQLUpdate.class.getName());
 	
 	public SPARQLUpdate(Repository rep) {
 		super(rep);
@@ -53,11 +54,11 @@ public class SPARQLUpdate extends AbstractSailsResource {
 				throw new MalformedQueryException("empty query");
 			}
 			Update update = conn.prepareUpdate(QueryLanguage.SPARQL, query);
-			logger.debug("[BEGIN] Update transaction begin");
+			logger.log(Level.FINER, "[BEGIN] Update transaction begin");
 			conn.begin();
-			logger.debug("[EXEC] Update execution");
+			logger.log(Level.FINER, "[EXEC] Update execution");
 			update.execute();
-			logger.debug("[COMMIT] Update transaction commit");
+			logger.log(Level.FINER, "[COMMIT] Update transaction commit");
 			conn.commit();
 			return Response.ok().build();
 		} catch (MalformedQueryException ex) {

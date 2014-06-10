@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -36,10 +37,10 @@ public class CloseableRepositoryConnection implements
 	RepositoryConnection, AutoCloseable {
 	
 	private final RepositoryConnection conn;
-	private final Logger logger = Logger.getRootLogger();
+	private static final Logger logger = Logger.getLogger(CloseableRepositoryConnection.class.getName());
 	
 	public CloseableRepositoryConnection(RepositoryConnection conn) {
-		logger.debug("[NEW] RepositoryConnection (" + conn.hashCode() + ")");
+		logger.log(Level.FINER, "[NEW] RepositoryConnection ({0})", conn.hashCode());
 		this.conn = conn;
 	}
 
@@ -71,11 +72,11 @@ public class CloseableRepositoryConnection implements
 	@Override
 	public void close() throws RepositoryException {
 		if (isActive()) {
-			logger.debug("[CLOSED ROLLBACK] RepositoryConnection rolled back (" + conn.hashCode() + ")");
+			logger.log(Level.FINER, "[CLOSED ROLLBACK] RepositoryConnection rolled back ({0})", conn.hashCode());
 			conn.rollback();
 		}
 		if (isOpen()) {
-			logger.debug("[CLOSED] RepositoryConnection closed (" + conn.hashCode() + ")");
+			logger.log(Level.FINER, "[CLOSED] RepositoryConnection closed ({0})", conn.hashCode());
 			conn.close();
 		}
 	}
@@ -187,19 +188,19 @@ public class CloseableRepositoryConnection implements
 
 	@Override
 	public void begin() throws RepositoryException {
-		logger.debug("[BEGIN] Begin transaction (" + conn.hashCode() + ")");
+		logger.log(Level.FINER, "[BEGIN] Begin transaction ({0})", conn.hashCode());
 		conn.begin();
 	}
 
 	@Override
 	public void commit() throws RepositoryException {
-		logger.debug("[COMMIT] Commit transaction (" + conn.hashCode() + ")");
+		logger.log(Level.FINER, "[COMMIT] Commit transaction ({0})", conn.hashCode());
 		conn.commit();
 	}
 
 	@Override
 	public void rollback() throws RepositoryException {
-		logger.debug("[ROLLBACK] Commit rollback (" + conn.hashCode() + ")");
+		logger.log(Level.FINER, "[ROLLBACK] Commit rollback ({0})", conn.hashCode());
 		conn.rollback();
 	}
 
