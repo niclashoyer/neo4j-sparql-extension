@@ -16,14 +16,14 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.Update;
 import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 
 public class SPARQLUpdate extends AbstractSailsResource {
 	
 	private static final Logger logger = Logger.getLogger(SPARQLUpdate.class.getName());
 	
-	public SPARQLUpdate(Repository rep) {
+	public SPARQLUpdate(SailRepository rep) {
 		super(rep);
 	}
 	

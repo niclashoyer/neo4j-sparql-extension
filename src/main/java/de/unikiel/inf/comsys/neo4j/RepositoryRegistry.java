@@ -6,7 +6,6 @@ import com.tinkerpop.blueprints.impls.neo4j2.Neo4j2Graph;
 import com.tinkerpop.blueprints.oupls.sail.GraphSail;
 import java.util.WeakHashMap;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFParserRegistry;
@@ -26,7 +25,7 @@ public class RepositoryRegistry {
 	private static final WeakHashMap<GraphDatabaseService, RepositoryRegistry>
 		map = new WeakHashMap<>();
 	private static boolean rioInitialized = false;
-	private final Repository rep;
+	private final SailRepository rep;
  
     private RepositoryRegistry(GraphDatabaseService database)
 			throws RepositoryException {
@@ -49,7 +48,7 @@ public class RepositoryRegistry {
         return inst;
     }
 	
-	public Repository getRepository() {
+	public SailRepository getRepository() {
 		return rep;
 	}
 	
