@@ -109,7 +109,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 				QueryLanguage.SPARQL,
 				queryString,
 				uriInfo.getAbsolutePath().toASCIIString());
-			query.setMaxQueryTime(30); // FIXME: max query time as parameter
+			query.setMaxQueryTime(120); // FIXME: max query time as parameter
 			final List<Variant> acceptable;
 			boolean isGraphQuery = false;
 			if (query instanceof GraphQuery) {
