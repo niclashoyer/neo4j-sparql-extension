@@ -29,23 +29,27 @@ import org.openrdf.sail.memory.MemoryStore;
 
 public class QueryRewriter {
 	
-	protected SailRepository rep;
+	protected SailRepositoryConnection conn;
 	protected ValueFactory vf;
 	protected List<QueryTransformation> transformations;
 	
-	public QueryRewriter(SailRepository rep) {
-		this(rep, Collections.EMPTY_LIST);
+	public QueryRewriter(SailRepositoryConnection conn) {
+		this(conn, Collections.EMPTY_LIST);
 	}
 	
-	public QueryRewriter(SailRepository rep, QueryTransformation... tranformations) {
-		this(rep, Arrays.asList(tranformations));
+	public QueryRewriter(
+			SailRepositoryConnection conn,
+			QueryTransformation... tranformations) {
+		this(conn, Arrays.asList(tranformations));
 	}
 	
-	public QueryRewriter(SailRepository rep, List<QueryTransformation> transformations) {
+	public QueryRewriter(
+			SailRepositoryConnection conn,
+			List<QueryTransformation> transformations) {
 		this.transformations = new LinkedList<>();
 		addAll(transformations);
-		this.rep = rep;
-		this.vf  = rep.getValueFactory();
+		this.conn = conn;
+		this.vf   = conn.getValueFactory();
 	}
 	
 	public void add(QueryTransformation tf) {
@@ -80,11 +84,11 @@ public class QueryRewriter {
 			valf.createURI("http://kai.uni-kiel.de/hasChild"),
 			valf.createURI("http://kai.uni-kiel.de/PersonD")));
 		conn.add(stmts);
-		QueryRewriter rewriter = new QueryRewriter(repository);
+		QueryRewriter rewriter = new QueryRewriter(conn);
 		rewriter.add(new ObjectPropertyChainTransformation());
 		rewriter.add(new SymmetricPropertyTransformation());
 		String qstr = "PREFIX : <http://kai.uni-kiel.de/>\n" +
-				"SELECT ?s ?o WHERE { ?s :hasGrandparent ?o }";
+				"SELECT ?s ?o WHERE { ?s :hasGrandparent ?o . ?o :hasGrandparent ?s . ?o a :Person . ?s a :Person }";
 		TupleQuery q = (TupleQuery) rewriter.rewrite(
 				QueryLanguage.SPARQL, qstr, "http://example.com");
 		q.evaluate(new SPARQLResultsTSVWriter(System.out));
@@ -110,7 +114,7 @@ public class QueryRewriter {
 			System.out.println(expr);
 		}
 		return new SailTupleExprQuery(
-				new ParsedTupleQuery(expr), rep.getConnection());
+				new ParsedTupleQuery(expr), conn);
 	}
 	
 }
