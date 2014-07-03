@@ -2,8 +2,9 @@ package de.unikiel.inf.comsys.neo4j.inference;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
-import de.unikiel.inf.comsys.neo4j.inference.visitor.ObjectPropertyChainTransformation;
-import de.unikiel.inf.comsys.neo4j.inference.visitor.SymmetricPropertyTransformation;
+import de.unikiel.inf.comsys.neo4j.inference.rules.ObjectPropertyChain;
+import de.unikiel.inf.comsys.neo4j.inference.rules.SymmetricObjectProperty;
+import de.unikiel.inf.comsys.neo4j.inference.rules.TransitiveObjectProperty;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -12,7 +13,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
@@ -30,7 +30,6 @@ import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.query.resultio.QueryResultParseException;
 import org.openrdf.query.resultio.TupleQueryResultParser;
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLParserFactory;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
@@ -144,11 +143,20 @@ public class SPARQLInferenceTest {
 				new SPARQLResultsXMLParserFactory();
 		parser = factory.getParser();
 		parser.setValueFactory(vf);
-		QueryRewriter rewriter = new QueryRewriter(conn);
-		rewriter.add(new ObjectPropertyChainTransformation());
-		rewriter.add(new SymmetricPropertyTransformation());
+		ArrayList<Rule> rules = new ArrayList<>();
+		rules.add(new SymmetricObjectProperty("http://comsys.uni-kiel.de/sparql/test/hasSpouse"));
+		rules.add(new ObjectPropertyChain(
+			"http://comsys.uni-kiel.de/sparql/test/hasUncle",
+			"http://comsys.uni-kiel.de/sparql/test/hasFather",
+			"http://comsys.uni-kiel.de/sparql/test/hasBrother"));
+		rules.add(new TransitiveObjectProperty("http://comsys.uni-kiel.de/sparql/test/hasAncestor"));
+		QueryRewriter rewriter = new QueryRewriter(conn, rules);
 		query = (TupleQuery) rewriter.rewrite(QueryLanguage.SPARQL, queryString);
 		nonInfQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+		System.out.println("== QUERY (" + this.name + ") ==");
+		System.out.println(nonInfQuery);
+		System.out.println("== REWRITTEN QUERY (" + this.name + ") ==");
+		System.out.println(query);
 	}
 	
 	@After
@@ -204,7 +212,7 @@ public class SPARQLInferenceTest {
 		return new QueryResult(expectset, actualset, noninfset);
 	}
 	
-	@Rule
+	@org.junit.Rule
     public ErrorCollector collector = new ErrorCollector();
 	
 	@Test
