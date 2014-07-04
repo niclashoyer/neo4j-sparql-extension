@@ -4,14 +4,12 @@ package de.unikiel.inf.comsys.neo4j.inference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.Query;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.algebra.QueryModelVisitor;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.ParsedTupleQuery;
@@ -25,7 +23,7 @@ public class QueryRewriter {
 	
 	private SailRepositoryConnection conn;
 	private ValueFactory vf;
-	private List<Rule> rules;
+	private ArrayList<Rule> rules;
 	
 	public QueryRewriter(SailRepositoryConnection conn) {
 		this(conn, Collections.EMPTY_LIST);

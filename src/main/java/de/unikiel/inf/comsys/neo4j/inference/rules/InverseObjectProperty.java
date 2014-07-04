@@ -2,7 +2,6 @@ package de.unikiel.inf.comsys.neo4j.inference.rules;
 
 import de.unikiel.inf.comsys.neo4j.inference.algebra.ConstVar;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.Union;
 import org.openrdf.query.algebra.Var;
@@ -19,16 +18,8 @@ public class InverseObjectProperty extends AbstractRule {
 
 	@Override
 	public boolean canApply(StatementPattern node) {
-		Var p = node.getPredicateVar();
-		if (p.isConstant()) {
-			Value val = p.getValue();
-			if (val instanceof URI) {
-				URI uri = (URI) val;
-				String op = uri.stringValue();
-				return op.equals(op1) || op.equals(op2);
-			}
-		}
-		return false;
+		String op = getPredicate(node);
+		return op != null && (op.equals(op1) || op.equals(op2));
 	}
 
 	@Override
@@ -45,10 +36,14 @@ public class InverseObjectProperty extends AbstractRule {
 		} else {
 			p2 = new ConstVar(vf.createURI(op1));
 		}
+		StatementPattern left  = node.clone();
+		StatementPattern right = new StatementPattern(o, p2, s, c);
 		node.replaceWith(
 			new Union(
-				node.clone(),
-				new StatementPattern(o, p2, s, c)));
+				left,
+				right));
+		visitNext(left);
+		visitNext(right);
 	}
 
 }

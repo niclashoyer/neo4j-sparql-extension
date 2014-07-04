@@ -2,9 +2,7 @@ package de.unikiel.inf.comsys.neo4j.inference;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
-import de.unikiel.inf.comsys.neo4j.inference.rules.ObjectPropertyChain;
-import de.unikiel.inf.comsys.neo4j.inference.rules.SymmetricObjectProperty;
-import de.unikiel.inf.comsys.neo4j.inference.rules.TransitiveObjectProperty;
+import de.unikiel.inf.comsys.neo4j.inference.rules.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -145,11 +143,11 @@ public class SPARQLInferenceTest {
 		parser.setValueFactory(vf);
 		ArrayList<Rule> rules = new ArrayList<>();
 		rules.add(new SymmetricObjectProperty("http://comsys.uni-kiel.de/sparql/test/hasSpouse"));
-		rules.add(new ObjectPropertyChain(
-			"http://comsys.uni-kiel.de/sparql/test/hasUncle",
-			"http://comsys.uni-kiel.de/sparql/test/hasFather",
-			"http://comsys.uni-kiel.de/sparql/test/hasBrother"));
+		rules.add(new ObjectPropertyChain("http://comsys.uni-kiel.de/sparql/test/hasUncle", "http://comsys.uni-kiel.de/sparql/test/hasFather", "http://comsys.uni-kiel.de/sparql/test/hasBrother"));
 		rules.add(new TransitiveObjectProperty("http://comsys.uni-kiel.de/sparql/test/hasAncestor"));
+		rules.add(new SubClassOf("http://comsys.uni-kiel.de/sparql/test/Woman", "http://comsys.uni-kiel.de/sparql/test/Person"));
+		rules.add(new PredicateVariable());
+		rules.add(new SubObjectPropertyOf("http://comsys.uni-kiel.de/sparql/test/hasAncestor", "http://www.w3.org/2002/07/owl#topObjectProperty"));
 		QueryRewriter rewriter = new QueryRewriter(conn, rules);
 		query = (TupleQuery) rewriter.rewrite(QueryLanguage.SPARQL, queryString);
 		nonInfQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);

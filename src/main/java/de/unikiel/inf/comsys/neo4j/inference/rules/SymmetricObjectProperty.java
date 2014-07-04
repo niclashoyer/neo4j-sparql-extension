@@ -16,15 +16,8 @@ public class SymmetricObjectProperty extends AbstractRule {
 
 	@Override
 	public boolean canApply(StatementPattern node) {
-		Var p = node.getPredicateVar();
-		if (p.isConstant()) {
-			Value val = p.getValue();
-			if (val instanceof URI) {
-				URI uri = (URI) val;
-				return uri.stringValue().equals(op);
-			}
-		}
-		return false;
+		String op1 = getPredicate(node);
+		return op1 != null && op1.equals(op);
 	}
 
 	@Override
@@ -33,10 +26,12 @@ public class SymmetricObjectProperty extends AbstractRule {
 		Var p = node.getPredicateVar();
 		Var o = node.getObjectVar();
 		Var c = node.getContextVar();
+		StatementPattern left  = node.clone();
+		StatementPattern right = new StatementPattern(o, p, s, c);
 		node.replaceWith(
-			new Union(
-				node.clone(),
-				new StatementPattern(o, p, s, c)));
+			new Union(left, right));
+		visitNext(left);
+		visitNext(right);
 	}
 
 }

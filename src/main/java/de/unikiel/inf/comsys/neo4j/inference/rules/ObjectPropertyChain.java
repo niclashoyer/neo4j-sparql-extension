@@ -4,8 +4,6 @@ package de.unikiel.inf.comsys.neo4j.inference.rules;
 import de.unikiel.inf.comsys.neo4j.inference.algebra.ConstVar;
 import java.util.Arrays;
 import java.util.List;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.query.algebra.Join;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
@@ -31,21 +29,13 @@ public class ObjectPropertyChain extends AbstractRule {
 		if (chain.isEmpty()) {
 			return false;
 		}
-		Var p = node.getPredicateVar();
-		if (p.isConstant()) {
-			Value val = p.getValue();
-			if (val instanceof URI) {
-				URI uri = (URI) val;
-				return uri.stringValue().equals(op);
-			}
-		}
-		return false;
+		String op1 = getPredicate(node);
+		return op1 != null && op1.equals(op);
 	}
 	
 	@Override
 	public void apply(StatementPattern node) {
 		Var s = node.getSubjectVar();
-		Var p = node.getPredicateVar();
 		Var o = node.getObjectVar();
 		Var c = node.getContextVar();
 		node.replaceWith(
@@ -83,12 +73,13 @@ public class ObjectPropertyChain extends AbstractRule {
 				o.setAnonymous(true);
 				right.setObjectVar(o);
 				left = right;
-				right = new StatementPattern(o, p, object);
+				right = new StatementPattern(o, p, object, context);
 				newjoin = new Join(left, right);
 				join.setRightArg(newjoin);
 				join = newjoin;
 			}
 		}
+		visitNext(ret);
 		return ret;
 	}
 	
