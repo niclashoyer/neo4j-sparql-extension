@@ -59,6 +59,7 @@ extends QueryModelVisitorBase<RuntimeException> {
 					removeRule(toApply, toVisit, r);
 					toVisit.visit(this);
 				}
+				break; // FIXME: check if this break is correct
 			}
 		}
 	}

@@ -146,7 +146,7 @@ public class SPARQLInferenceTest {
 		rules.add(new ObjectPropertyChain("http://comsys.uni-kiel.de/sparql/test/hasUncle", "http://comsys.uni-kiel.de/sparql/test/hasFather", "http://comsys.uni-kiel.de/sparql/test/hasBrother"));
 		rules.add(new TransitiveObjectProperty("http://comsys.uni-kiel.de/sparql/test/hasAncestor"));
 		rules.add(new SubClassOf("http://comsys.uni-kiel.de/sparql/test/Woman", "http://comsys.uni-kiel.de/sparql/test/Person"));
-		rules.add(new PredicateVariable());
+		rules.add(new PredicateVariable("http://www.w3.org/2002/07/owl#topObjectProperty", "http://comsys.uni-kiel.de/sparql/test/hasAncestor"));
 		rules.add(new SubObjectPropertyOf("http://comsys.uni-kiel.de/sparql/test/hasAncestor", "http://www.w3.org/2002/07/owl#topObjectProperty"));
 		QueryRewriter rewriter = new QueryRewriter(conn, rules);
 		query = (TupleQuery) rewriter.rewrite(QueryLanguage.SPARQL, queryString);
@@ -190,6 +190,11 @@ public class SPARQLInferenceTest {
 		
 		public Multiset<BindingSet> getDiff() {
 			return Multisets.difference(expect, actual);
+		}
+		
+		@Override
+		public String toString() {
+			return getActual() + "\n" + getExpected();
 		}
 	}
 	
