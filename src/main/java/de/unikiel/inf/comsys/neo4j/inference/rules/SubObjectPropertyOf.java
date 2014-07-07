@@ -39,4 +39,9 @@ public class SubObjectPropertyOf extends AbstractRule {
 		visitNext(right);
 	}
 	
+	@Override
+	public String toString() {
+		return "SubObjectPropertyOf(<" + op1 + "> <" + op2 + ">)";
+	}
+	
 }

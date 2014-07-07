@@ -1,6 +1,7 @@
 
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
+import com.google.common.base.Joiner;
 import de.unikiel.inf.comsys.neo4j.inference.algebra.ConstVar;
 import java.util.Arrays;
 import java.util.List;
@@ -81,6 +82,16 @@ public class ObjectPropertyChain extends AbstractRule {
 		}
 		visitNext(ret);
 		return ret;
+	}
+
+	@Override
+	public String toString() {
+		String str = "";
+		if (!chain.isEmpty()) {
+			str += " <";
+			str += Joiner.on("> <").join(chain) + ">";
+		}
+		return "ObjectPropertyChain(<" + op + ">" + str + ")";
 	}
 	
 }

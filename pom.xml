@@ -15,6 +15,7 @@
         <junit.version>4.11</junit.version>
         <jersey.version>1.9</jersey.version>
         <jackson.version>1.9.13</jackson.version>
+        <owlapi.version>3.5.0</owlapi.version>
     </properties>
     <licenses>
         <license>
@@ -197,7 +198,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>17.0</version>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-distribution</artifactId>
+            <version>${owlapi.version}</version>
         </dependency>
     </dependencies>
     <build>

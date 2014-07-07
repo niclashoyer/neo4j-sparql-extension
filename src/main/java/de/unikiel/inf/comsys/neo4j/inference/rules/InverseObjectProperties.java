@@ -6,12 +6,12 @@ import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.Union;
 import org.openrdf.query.algebra.Var;
 
-public class InverseObjectProperty extends AbstractRule {
+public class InverseObjectProperties extends AbstractRule {
 
 	private final String op1;
 	private final String op2;
 
-	public InverseObjectProperty(String op1, String op2) {
+	public InverseObjectProperties(String op1, String op2) {
 		this.op1 = op1;
 		this.op2 = op2;
 	}
@@ -46,4 +46,9 @@ public class InverseObjectProperty extends AbstractRule {
 		visitNext(right);
 	}
 
+	@Override
+	public String toString() {
+		return "InverseObjectProperty(<" + op1 + "> <" + op2 + ">)";
+	}
+	
 }

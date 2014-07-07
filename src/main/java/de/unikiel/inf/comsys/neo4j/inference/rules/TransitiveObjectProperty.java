@@ -35,4 +35,9 @@ public class TransitiveObjectProperty implements Rule {
 		return prop.getNextVisits();
 	}
 	
+	@Override
+	public String toString() {
+		return "TransitiveObjectProperty(" + prop.toString() + ")";
+	}
+	
 }

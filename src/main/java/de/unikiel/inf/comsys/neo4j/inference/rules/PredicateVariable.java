@@ -1,10 +1,10 @@
 
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
+import com.google.common.base.Joiner;
 import de.unikiel.inf.comsys.neo4j.inference.algebra.ConstVar;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.openrdf.query.algebra.EmptySet;
 import org.openrdf.query.algebra.Extension;
@@ -89,6 +89,16 @@ public class PredicateVariable extends AbstractRule {
 		node.replaceWith(
 			new Union(left, right));
 		visitNext(left);
+	}
+	
+	@Override
+	public String toString() {
+		String str = "";
+		if (!predicates.isEmpty()) {
+			str += "<";
+			str += Joiner.on("> <").join(predicates) + ">";
+		}
+		return "PredicateVariable("+ str + ")";
 	}
 	
 }

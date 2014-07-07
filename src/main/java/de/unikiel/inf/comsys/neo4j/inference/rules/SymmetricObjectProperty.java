@@ -34,4 +34,9 @@ public class SymmetricObjectProperty extends AbstractRule {
 		visitNext(right);
 	}
 
+	@Override
+	public String toString() {
+		return "SymmetricObjectProperty(<" + op + ">)";
+	}
+	
 }
