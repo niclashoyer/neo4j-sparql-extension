@@ -6,8 +6,8 @@ import de.unikiel.inf.comsys.neo4j.http.SPARQLUpdate;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.SailException;
 
 @Path("/")
@@ -19,7 +19,7 @@ public class RDFServerExtension {
 
     public RDFServerExtension(@Context GraphDatabaseService database)
 			throws SailException, RepositoryException {
-		Repository rep = RepositoryRegistry
+		SailRepository rep = RepositoryRegistry
 			.getInstance(database)
 			.getRepository();
 		query = new SPARQLQuery(rep);

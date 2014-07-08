@@ -4,17 +4,17 @@ package de.unikiel.inf.comsys.neo4j.http;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 
 public abstract class AbstractSailsResource {
 	
-	protected final Repository rep;
+	protected final SailRepository rep;
 	protected final List<Variant> rdfResultVariants;
 	
-	public AbstractSailsResource(Repository rep) {
+	public AbstractSailsResource(SailRepository rep) {
 		this.rep = rep;
 		rdfResultVariants = Variant.mediaTypes(
 			MediaType.valueOf(RDFMediaType.RDF_TURTLE),

@@ -25,9 +25,9 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 import org.openrdf.model.Resource;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 
@@ -35,7 +35,7 @@ public class GraphStore extends AbstractSailsResource {
 
 	private final ValueFactory vf;
 	
-	public GraphStore(Repository rep) {
+	public GraphStore(SailRepository rep) {
 		super(rep);
 		this.vf = rep.getValueFactory();
 	}

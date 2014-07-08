@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+  <head>
+    <variable name="p"/>
+  </head>
+  <results>
+    <result>
+      <binding name="p">
+        <uri>http://comsys.uni-kiel.de/sparql/test/hasAncestor</uri>
+      </binding>
+    </result>
+    <result>
+      <binding name="p">
+        <uri>http://www.w3.org/2002/07/owl#topObjectProperty</uri>
+      </binding>
+    </result>
+  </results>
+</sparql>

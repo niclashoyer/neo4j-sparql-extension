@@ -15,6 +15,7 @@
         <junit.version>4.11</junit.version>
         <jersey.version>1.9</jersey.version>
         <jackson.version>1.9.13</jackson.version>
+        <owlapi.version>3.5.0</owlapi.version>
     </properties>
     <licenses>
         <license>
@@ -187,6 +188,22 @@
             <version>1.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-memory</artifactId>
+            <version>${sesame.version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-distribution</artifactId>
+            <version>${owlapi.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -213,7 +230,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <!--<redirectTestOutputToFile>true</redirectTestOutputToFile>-->
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
                 <version>2.17</version>
             </plugin>

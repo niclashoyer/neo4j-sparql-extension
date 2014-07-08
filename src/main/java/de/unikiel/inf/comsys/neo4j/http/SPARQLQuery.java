@@ -29,9 +29,9 @@ import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriterFactory;
 import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriterFactory;
 import org.openrdf.query.resultio.text.tsv.SPARQLResultsTSVWriterFactory;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFWriterFactory;
 import org.openrdf.rio.RDFWriterRegistry;
 
@@ -40,7 +40,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 	private final List<Variant> queryResultVariants;
 	private final RDFWriterRegistry registry;
 	
-	public SPARQLQuery(Repository rep) {
+	public SPARQLQuery(SailRepository rep) {
 		super(rep);
 		queryResultVariants = Variant.mediaTypes(
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_JSON),
@@ -109,7 +109,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 				QueryLanguage.SPARQL,
 				queryString,
 				uriInfo.getAbsolutePath().toASCIIString());
-			query.setMaxQueryTime(5); // FIXME: max query time as parameter
+			query.setMaxQueryTime(120); // FIXME: max query time as parameter
 			final List<Variant> acceptable;
 			boolean isGraphQuery = false;
 			if (query instanceof GraphQuery) {
