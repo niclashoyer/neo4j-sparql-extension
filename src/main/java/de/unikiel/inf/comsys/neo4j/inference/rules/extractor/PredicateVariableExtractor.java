@@ -5,7 +5,6 @@ import de.unikiel.inf.comsys.neo4j.inference.Rule;
 import de.unikiel.inf.comsys.neo4j.inference.rules.PredicateVariable;
 import de.unikiel.inf.comsys.neo4j.inference.rules.SubObjectPropertyOf;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.openrdf.model.vocabulary.OWL;
 import org.semanticweb.owlapi.model.AxiomType;

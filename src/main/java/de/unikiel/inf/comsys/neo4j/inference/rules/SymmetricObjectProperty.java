@@ -1,7 +1,5 @@
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.Union;
 import org.openrdf.query.algebra.Var;
