@@ -18,6 +18,7 @@ import org.openrdf.query.Update;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.repository.sail.SailRepositoryConnection;
 
 public class SPARQLUpdate extends AbstractSailsResource {
 	
@@ -49,7 +50,13 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			String query,
 			List<String> defgraphs,
 			List<String> namedgraphs) {
-		try (CloseableRepositoryConnection conn = getConnection()) {
+		SailRepositoryConnection conn;
+		try {
+			conn = getConnection();
+		} catch (RepositoryException ex) {
+			throw new WebApplicationException(ex);
+		}
+		try {
 			if (query == null) {
 				throw new MalformedQueryException("empty query");
 			}
@@ -60,12 +67,15 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			update.execute();
 			logger.log(Level.FINER, "[COMMIT] Update transaction commit");
 			conn.commit();
+			close(conn);
 			return Response.ok().build();
 		} catch (MalformedQueryException ex) {
 			String str = ex.getMessage();
+			close(conn, ex);
 			return Response.status(Response.Status.BAD_REQUEST).entity(
 					str.getBytes(Charset.forName("UTF-8"))).build();
 		} catch (RepositoryException | UpdateExecutionException ex) {
+			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}
 	}

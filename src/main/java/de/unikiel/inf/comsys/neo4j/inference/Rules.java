@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -23,6 +24,24 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 public class Rules {
 	
 	private Rules() {
+	}
+	
+	public static List<Rule> fromOntology(OWLOntologyDocumentSource src) {
+		try {
+			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+			System.out.println("[RULES] Loading ontology...");
+			manager.loadOntologyFromOntologyDocument(src);
+			Set<OWLOntology> ontologies = manager.getOntologies();
+			System.out.println("[RULES] Ontologies loaded: " + ontologies.size());
+			if (ontologies.isEmpty()) {
+				return Collections.EMPTY_LIST;
+			} else {
+				return fromOntology(ontologies.iterator().next());
+			}
+		} catch (OWLOntologyCreationException ex) {
+			throw new IllegalArgumentException(
+					"Loading ontology stream failed", ex);
+		}
 	}
 	
 	public static List<Rule> fromOntology(InputStream in) {
