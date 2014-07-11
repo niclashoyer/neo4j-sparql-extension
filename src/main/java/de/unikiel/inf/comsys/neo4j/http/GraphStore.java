@@ -28,6 +28,7 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 
@@ -155,7 +156,13 @@ public class GraphStore extends AbstractSailsResource {
 			String def,
 			InputStream in,
 			boolean clear) {
-		try (CloseableRepositoryConnection conn = getConnection()) {
+		SailRepositoryConnection conn;
+		try {
+			conn = getConnection();
+		} catch (RepositoryException ex) {
+			throw new WebApplicationException(ex);
+		}
+		try {
 			Resource dctx = null;
 			String base = uriInfo.getAbsolutePath().toASCIIString();
 			if (graphString != null) {
@@ -180,18 +187,27 @@ public class GraphStore extends AbstractSailsResource {
 				conn.add(in, base, format);
 			}
 			conn.commit();
+			close(conn);
 			return Response.noContent().build();
 		} catch (RDFParseException ex) {
 			String str = ex.getMessage();
+			close(conn, ex);
 			return Response.status(400).entity(
 					str.getBytes(Charset.forName("UTF-8"))).build();
 		} catch(IOException | RepositoryException ex) {
+			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}
 	}
 	
 	private Response handleClear(String graphString) {
-		try (CloseableRepositoryConnection conn = getConnection()) {
+		SailRepositoryConnection conn;
+		try {
+			conn = getConnection();
+		} catch (RepositoryException ex) {
+			throw new WebApplicationException(ex);
+		}
+		try {
 			conn.begin();
 			if (graphString != null) {
 				Resource ctx = vf.createURI(graphString);
@@ -200,7 +216,9 @@ public class GraphStore extends AbstractSailsResource {
 				conn.clear();
 			}
 			conn.commit();
+			close(conn);
 		} catch (RepositoryException ex) {
+			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}
 		return Response.noContent().build();

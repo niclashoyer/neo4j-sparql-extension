@@ -1,8 +1,11 @@
 
 package de.unikiel.inf.comsys.neo4j.http;
 
+import de.unikiel.inf.comsys.neo4j.QueryRewriterFactory;
+import de.unikiel.inf.comsys.neo4j.SPARQLExtensionProps;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLGraphStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLResultStreamingOutput;
+import de.unikiel.inf.comsys.neo4j.inference.QueryRewriter;
 import java.nio.charset.Charset;
 import java.util.List;
 import javax.ws.rs.Consumes;
@@ -29,9 +32,9 @@ import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriterFactory;
 import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriterFactory;
 import org.openrdf.query.resultio.text.tsv.SPARQLResultsTSVWriterFactory;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFWriterFactory;
 import org.openrdf.rio.RDFWriterRegistry;
 
@@ -39,6 +42,8 @@ public class SPARQLQuery extends AbstractSailsResource {
 	
 	private final List<Variant> queryResultVariants;
 	private final RDFWriterRegistry registry;
+	private final QueryRewriterFactory qwfactory;
+	private final int timeout;
 	
 	public SPARQLQuery(SailRepository rep) {
 		super(rep);
@@ -48,7 +53,10 @@ public class SPARQLQuery extends AbstractSailsResource {
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_CSV),
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_TSV)
 		).add().build();
-		this.registry = RDFWriterRegistry.getInstance();
+		this.registry  = RDFWriterRegistry.getInstance();
+		this.qwfactory = QueryRewriterFactory.getInstance(rep);
+		String sout    = SPARQLExtensionProps.getProperty("query.timeout");
+		this.timeout   = Integer.parseInt(sout);
 	}
 	
     @GET
@@ -67,8 +75,10 @@ public class SPARQLQuery extends AbstractSailsResource {
 			@Context UriInfo uriInfo,
 			@QueryParam("query") String queryString,
 			@QueryParam("default-graph-uri") List<String> defgraphs,
-			@QueryParam("named-graph-uri") List<String> namedgraphs) {
-		return handleQuery(req, uriInfo, queryString, defgraphs, namedgraphs);
+			@QueryParam("named-graph-uri") List<String> namedgraphs,
+			@QueryParam("inference") String inference) {
+		return handleQuery(
+			req, uriInfo, queryString, defgraphs, namedgraphs, inference);
     }
 	
 	@POST
@@ -78,8 +88,10 @@ public class SPARQLQuery extends AbstractSailsResource {
 			@Context UriInfo uriInfo,
 			@FormParam("query") String queryString,
 			@FormParam("default-graph-uri") List<String> defgraphs,
-			@FormParam("named-graph-uri") List<String> namedgraphs) {
-		return handleQuery(req, uriInfo, queryString, defgraphs, namedgraphs);
+			@FormParam("named-graph-uri") List<String> namedgraphs,
+			@FormParam("inference") String inference) {
+		return handleQuery(
+			req, uriInfo, queryString, defgraphs, namedgraphs, inference);
 	}
 
 	@POST
@@ -89,8 +101,10 @@ public class SPARQLQuery extends AbstractSailsResource {
 			@Context UriInfo uriInfo,
 			@QueryParam("default-graph-uri") List<String> defgraphs,
 			@QueryParam("named-graph-uri") List<String> namedgraphs,
+			@QueryParam("inference") String inference,
 			String queryString) {
-		return handleQuery(req, uriInfo, queryString, defgraphs, namedgraphs);
+		return handleQuery(
+			req, uriInfo, queryString, defgraphs, namedgraphs, inference);
 	}
 	
 	private Response handleQuery (
@@ -98,18 +112,28 @@ public class SPARQLQuery extends AbstractSailsResource {
 			UriInfo uriInfo,
 			String queryString,
 			List<String> defgraphs,
-			List<String> namedgraphs) {
-		RepositoryConnection conn = null;
+			List<String> namedgraphs,
+			String inference) {
+		SailRepositoryConnection conn = null;
 		try {
 			if (queryString == null) {
 				throw new MalformedQueryException("Missing query parameter");
 			}
 			conn = getConnection();
-			final Query query = conn.prepareQuery(
-				QueryLanguage.SPARQL,
-				queryString,
-				uriInfo.getAbsolutePath().toASCIIString());
-			query.setMaxQueryTime(120); // FIXME: max query time as parameter
+			final Query query;
+			if (inference != null && inference.equals("true")) {
+				QueryRewriter qw = qwfactory.getRewriter(conn);
+				query = qw.rewrite(
+					QueryLanguage.SPARQL,
+					queryString,
+					uriInfo.getAbsolutePath().toASCIIString());
+			} else {
+				query = conn.prepareQuery(
+					QueryLanguage.SPARQL,
+					queryString,
+					uriInfo.getAbsolutePath().toASCIIString());
+			}
+			query.setMaxQueryTime(timeout);
 			final List<Variant> acceptable;
 			boolean isGraphQuery = false;
 			if (query instanceof GraphQuery) {

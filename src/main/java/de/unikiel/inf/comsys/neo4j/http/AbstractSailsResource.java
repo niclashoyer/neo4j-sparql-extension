@@ -2,11 +2,13 @@
 package de.unikiel.inf.comsys.neo4j.http;
 
 import java.util.List;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 
 public abstract class AbstractSailsResource {
@@ -38,8 +40,20 @@ public abstract class AbstractSailsResource {
 		}
 	}
 	
-	protected CloseableRepositoryConnection getConnection() throws RepositoryException {
-		return new CloseableRepositoryConnection(rep.getConnection());
+	protected SailRepositoryConnection getConnection() throws RepositoryException {
+		return rep.getConnection();
+	}
+	
+	protected void close(RepositoryConnection conn) {
+		if (conn != null) {
+			try {
+				if (conn.isOpen()) {
+					conn.close();
+				}
+			} catch (RepositoryException ex) {
+				throw new WebApplicationException(ex);
+			}
+		}
 	}
 	
 	protected void close(RepositoryConnection conn, Exception ex) {
@@ -47,9 +61,6 @@ public abstract class AbstractSailsResource {
 			try {
 				if (conn.isOpen()) {
 					conn.close();
-				}
-				if (rep.isInitialized()) {
-					rep.shutDown();
 				}
 			} catch (RepositoryException ex2) {
 				ex.addSuppressed(ex2);

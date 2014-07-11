@@ -31,9 +31,6 @@ public abstract class AbstractStreamingOutput implements StreamingOutput {
 					conn.close();
 				}
 				Repository rep = conn.getRepository();
-				if (rep.isInitialized()) {
-					rep.shutDown();
-				}
 			} catch (RepositoryException ex2) {
 				ex.addSuppressed(ex2);
 			}
