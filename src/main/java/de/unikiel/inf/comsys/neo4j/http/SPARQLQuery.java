@@ -1,7 +1,7 @@
 
 package de.unikiel.inf.comsys.neo4j.http;
 
-import de.unikiel.inf.comsys.neo4j.QueryRewriterFactory;
+import de.unikiel.inf.comsys.neo4j.inference.QueryRewriterFactory;
 import de.unikiel.inf.comsys.neo4j.SPARQLExtensionProps;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLGraphStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLResultStreamingOutput;

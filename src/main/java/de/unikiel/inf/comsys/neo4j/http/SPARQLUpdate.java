@@ -22,7 +22,8 @@ import org.openrdf.repository.sail.SailRepositoryConnection;
 
 public class SPARQLUpdate extends AbstractSailsResource {
 	
-	private static final Logger logger = Logger.getLogger(SPARQLUpdate.class.getName());
+	private static final Logger logger =
+		Logger.getLogger(SPARQLUpdate.class.getName());
 	
 	public SPARQLUpdate(SailRepository rep) {
 		super(rep);

@@ -39,5 +39,10 @@ public class SubClassOf extends AbstractRule {
 		visitNext(left);
 		visitNext(right);
 	}
+
+	@Override
+	public String toString() {
+		return "SubClassOf(<" + ce1 + "> <" + ce2 + ">)";
+	}
 	
 }

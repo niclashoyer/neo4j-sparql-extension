@@ -6,6 +6,7 @@ import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.InverseObjectProper
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.ObjectPropertyChainExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.PredicateVariableExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.SubClassOfExtractor;
+import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.SubObjectPropertyOfExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.SymmetricPropertyExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.TransitiveObjectPropertyExtractor;
 import java.io.InputStream;
@@ -66,6 +67,7 @@ public class Rules {
 		extractors.add(new ObjectPropertyChainExtractor());
 		extractors.add(new PredicateVariableExtractor());
 		extractors.add(new SubClassOfExtractor());
+		extractors.add(new SubObjectPropertyOfExtractor());
 		extractors.add(new SymmetricPropertyExtractor());
 		extractors.add(new TransitiveObjectPropertyExtractor());
 		System.out.println("== AXIOMS ==");
