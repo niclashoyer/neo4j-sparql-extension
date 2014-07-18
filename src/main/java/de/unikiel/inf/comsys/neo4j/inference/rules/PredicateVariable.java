@@ -85,10 +85,10 @@ public class PredicateVariable extends AbstractRule {
 	@Override
 	public void apply(StatementPattern node) {
 		StatementPattern left = node.clone();
+		visitNext(left);
 		TupleExpr right = assignPredicates(predicates, node.clone());
 		node.replaceWith(
 			new Union(left, right));
-		visitNext(left);
 	}
 	
 	@Override

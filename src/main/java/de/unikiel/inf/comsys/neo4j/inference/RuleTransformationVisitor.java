@@ -2,8 +2,8 @@
 package de.unikiel.inf.comsys.neo4j.inference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.IdentityHashMap;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.algebra.QueryModelNode;
 import org.openrdf.query.algebra.StatementPattern;
@@ -14,12 +14,12 @@ extends QueryModelVisitorBase<RuntimeException> {
 
 	private final ValueFactory vf;
 	private final ArrayList<Rule> rules;
-	private final HashMap<QueryModelNode, ArrayList<Rule>> applied;
+	private final IdentityHashMap<QueryModelNode, ArrayList<Rule>> applied;
 	
 	public RuleTransformationVisitor(ValueFactory vf, ArrayList<Rule> rules) {
 		this.vf      = vf;
 		this.rules   = rules;
-		this.applied = new HashMap<>();
+		this.applied = new IdentityHashMap<>();
 	}
 	
 	private ArrayList<Rule> getRules(QueryModelNode node) {
@@ -52,14 +52,25 @@ extends QueryModelVisitorBase<RuntimeException> {
 	@Override
 	public void meet(StatementPattern node) throws RuntimeException {
 		ArrayList<Rule> toApply = new ArrayList<>(getRules(node));
+		/*
+		for (Rule r : toApply) {
+			System.out.print("[APPLY] ");
+			if (r.canApply(node)) {
+				System.out.println("[YES] " + r);
+			} else {
+				System.out.println("[NO] " + r);
+			}
+		}
+		*/
 		for (Rule r : toApply) {
 			if (r.canApply(node)) {
 				r.apply(node);
 				for (QueryModelNode toVisit : r.getNextVisits()) {
 					removeRule(toApply, toVisit, r);
+					//System.out.println("[VISITING] " + toVisit);
 					toVisit.visit(this);
 				}
-				break; // FIXME: check if this break is correct
+				break;
 			}
 		}
 	}

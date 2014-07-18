@@ -39,10 +39,11 @@ public class ObjectPropertyChain extends AbstractRule {
 		Var s = node.getSubjectVar();
 		Var o = node.getObjectVar();
 		Var c = node.getContextVar();
-		node.replaceWith(
-			new Union(
-				node.clone(),
-				getChain(s, o, c)));
+		TupleExpr left  = node.clone();
+		TupleExpr right = getChain(s, o, c);
+		visitNext(left);
+		visitNext(right);
+		node.replaceWith(new Union(left, right));
 	}
 	
 	private TupleExpr getChain(Var subject, Var object, Var context) {
@@ -80,7 +81,6 @@ public class ObjectPropertyChain extends AbstractRule {
 				join = newjoin;
 			}
 		}
-		visitNext(ret);
 		return ret;
 	}
 

@@ -6,9 +6,6 @@ import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.Union;
 
 public class SubObjectPropertyOf extends AbstractRule {
-
-	private final String RDFTYPE =
-		"http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 	
 	private final String op1;
 	private final String op2;

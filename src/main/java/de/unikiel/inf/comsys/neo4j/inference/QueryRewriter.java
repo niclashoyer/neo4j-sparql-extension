@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.query.Dataset;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.Query;
 import org.openrdf.query.QueryLanguage;
@@ -58,10 +57,11 @@ public class QueryRewriter {
 		QueryParser parser = f.getParser();
 		ParsedQuery parsed = parser.parseQuery(query, baseuri);
 		TupleExpr expr = parsed.getTupleExpr();
-		Dataset ds = parsed.getDataset();
 		RuleTransformationVisitor visitor =
 				new RuleTransformationVisitor(vf, rules);
+		System.out.println(expr);
 		expr.visit(visitor);
+		System.out.println(expr);
 		return new SailTupleExprQuery(
 				new ParsedTupleQuery(expr), conn);
 	}
