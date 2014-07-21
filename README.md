@@ -40,7 +40,7 @@ Base resource: `/rdf/update`
 
 ## Configuration
 
-To change the configuration add a `sparl-extension.properties` file in the
+To change the configuration add a `sparql-extension.properties` file in the
 `/conf` folder of the Neo4j server installation.
 
 The default configuration is as follows:
