@@ -9,6 +9,5 @@ import org.openrdf.query.algebra.StatementPattern;
 public interface Rule {
 	public void setValueFactory(ValueFactory vf);
 	public boolean canApply(StatementPattern node);
-	public void apply(StatementPattern node);
-	public List<QueryModelNode> getNextVisits();
+	public List<QueryModelNode> apply(StatementPattern node);
 }

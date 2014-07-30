@@ -1,7 +1,9 @@
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
 import de.unikiel.inf.comsys.neo4j.inference.algebra.ConstVar;
+import java.util.List;
 import org.openrdf.model.URI;
+import org.openrdf.query.algebra.QueryModelNode;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.Union;
 import org.openrdf.query.algebra.Var;
@@ -23,7 +25,8 @@ public class InverseObjectProperties extends AbstractRule {
 	}
 
 	@Override
-	public void apply(StatementPattern node) {
+	public List<QueryModelNode> apply(StatementPattern node) {
+		List<QueryModelNode> next = newNextList();
 		Var s = node.getSubjectVar();
 		Var p = node.getPredicateVar();
 		Var o = node.getObjectVar();
@@ -38,17 +41,15 @@ public class InverseObjectProperties extends AbstractRule {
 		}
 		StatementPattern left  = node.clone();
 		StatementPattern right = new StatementPattern(o, p2, s, c);
-		node.replaceWith(
-			new Union(
-				left,
-				right));
-		visitNext(left);
-		visitNext(right);
+		node.replaceWith(new Union(left, right));
+		next.add(left);
+		next.add(right);
+		return next;
 	}
 
 	@Override
 	public String toString() {
-		return "InverseObjectProperty(<" + op1 + "> <" + op2 + ">)";
+		return "InverseObjectProperties(<" + op1 + "> <" + op2 + ">)";
 	}
 	
 }

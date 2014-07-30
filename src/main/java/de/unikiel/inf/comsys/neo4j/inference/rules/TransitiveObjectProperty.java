@@ -21,18 +21,13 @@ public class TransitiveObjectProperty implements Rule {
 	}
 
 	@Override
-	public void apply(StatementPattern node) {
-		prop.apply(node);
+	public List<QueryModelNode> apply(StatementPattern node) {
+		return prop.apply(node);
 	}
 
 	@Override
 	public void setValueFactory(ValueFactory vf) {
 		prop.setValueFactory(vf);
-	}
-
-	@Override
-	public List<QueryModelNode> getNextVisits() {
-		return prop.getNextVisits();
 	}
 	
 	@Override

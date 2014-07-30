@@ -14,21 +14,10 @@ import org.openrdf.query.algebra.Var;
 public abstract class AbstractRule implements Rule {
 
 	protected ValueFactory vf;
-	protected List<QueryModelNode> next;
 	
 	@Override
 	public void setValueFactory(ValueFactory vf) {
 		this.vf = vf;
-		this.next = new LinkedList<>();
-	}
-
-	protected void visitNext(QueryModelNode node) {
-		next.add(node);
-	}
-	
-	@Override
-	public List<QueryModelNode> getNextVisits() {
-		return next;
 	}
 	
 	protected String getURIString(Var v) {
@@ -56,6 +45,10 @@ public abstract class AbstractRule implements Rule {
 	
 	protected String getContext(StatementPattern sp) {
 		return getURIString(sp.getContextVar());
+	}
+	
+	protected List<QueryModelNode> newNextList() {
+		return new LinkedList<>();
 	}
 	
 }

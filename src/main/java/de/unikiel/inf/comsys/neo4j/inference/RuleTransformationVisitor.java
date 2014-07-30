@@ -2,8 +2,9 @@
 package de.unikiel.inf.comsys.neo4j.inference;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.algebra.QueryModelNode;
 import org.openrdf.query.algebra.StatementPattern;
@@ -52,22 +53,11 @@ extends QueryModelVisitorBase<RuntimeException> {
 	@Override
 	public void meet(StatementPattern node) throws RuntimeException {
 		ArrayList<Rule> toApply = new ArrayList<>(getRules(node));
-		/*
-		for (Rule r : toApply) {
-			System.out.print("[APPLY] ");
-			if (r.canApply(node)) {
-				System.out.println("[YES] " + r);
-			} else {
-				System.out.println("[NO] " + r);
-			}
-		}
-		*/
 		for (Rule r : toApply) {
 			if (r.canApply(node)) {
-				r.apply(node);
-				for (QueryModelNode toVisit : r.getNextVisits()) {
+				List<QueryModelNode> next = r.apply(node);
+				for (QueryModelNode toVisit : next) {
 					removeRule(toApply, toVisit, r);
-					//System.out.println("[VISITING] " + toVisit);
 					toVisit.visit(this);
 				}
 				break;

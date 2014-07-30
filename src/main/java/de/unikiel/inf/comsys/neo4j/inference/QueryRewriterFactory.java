@@ -81,10 +81,12 @@ public class QueryRewriterFactory {
 							conn = rep.getConnection();
 							TurtleWriterFactory factory
 									= new TurtleWriterFactory();
-							System.out.println("[RULES] exporting ontology...");
 							conn.export(factory.getWriter(out), ctx);
+							out.close();
+							conn.close();
 						} catch (RepositoryException |
-								RDFHandlerException ex) {
+								RDFHandlerException |
+								IOException ex) {
 							try {
 								if (conn != null && conn.isOpen()) {
 									conn.close();

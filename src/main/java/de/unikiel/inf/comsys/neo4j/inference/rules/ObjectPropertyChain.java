@@ -6,6 +6,7 @@ import de.unikiel.inf.comsys.neo4j.inference.algebra.ConstVar;
 import java.util.Arrays;
 import java.util.List;
 import org.openrdf.query.algebra.Join;
+import org.openrdf.query.algebra.QueryModelNode;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.Union;
@@ -35,15 +36,17 @@ public class ObjectPropertyChain extends AbstractRule {
 	}
 	
 	@Override
-	public void apply(StatementPattern node) {
+	public List<QueryModelNode> apply(StatementPattern node) {
+		List<QueryModelNode> next = newNextList();
 		Var s = node.getSubjectVar();
 		Var o = node.getObjectVar();
 		Var c = node.getContextVar();
 		TupleExpr left  = node.clone();
 		TupleExpr right = getChain(s, o, c);
-		visitNext(left);
-		visitNext(right);
 		node.replaceWith(new Union(left, right));
+		next.add(left);
+		next.add(right);
+		return next;
 	}
 	
 	private TupleExpr getChain(Var subject, Var object, Var context) {

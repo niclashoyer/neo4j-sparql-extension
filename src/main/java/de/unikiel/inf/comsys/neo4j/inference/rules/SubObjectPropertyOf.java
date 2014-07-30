@@ -2,6 +2,8 @@
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
 import de.unikiel.inf.comsys.neo4j.inference.algebra.ConstVar;
+import java.util.List;
+import org.openrdf.query.algebra.QueryModelNode;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.Union;
 
@@ -22,7 +24,8 @@ public class SubObjectPropertyOf extends AbstractRule {
 	}
 
 	@Override
-	public void apply(StatementPattern node) {
+	public List<QueryModelNode> apply(StatementPattern node) {
+		List<QueryModelNode> next = newNextList();
 		StatementPattern left  = node.clone();
 		StatementPattern right =
 			new StatementPattern(
@@ -32,8 +35,9 @@ public class SubObjectPropertyOf extends AbstractRule {
 				node.getContextVar());
 		node.replaceWith(
 			new Union(left, right));
-		visitNext(left);
-		visitNext(right);
+		next.add(left);
+		next.add(right);
+		return next;
 	}
 	
 	@Override
