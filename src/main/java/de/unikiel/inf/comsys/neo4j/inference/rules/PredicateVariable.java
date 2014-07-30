@@ -9,6 +9,7 @@ import java.util.List;
 import org.openrdf.query.algebra.EmptySet;
 import org.openrdf.query.algebra.Extension;
 import org.openrdf.query.algebra.ExtensionElem;
+import org.openrdf.query.algebra.QueryModelNode;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.Union;
@@ -58,7 +59,8 @@ public class PredicateVariable extends AbstractRule {
 	}
 	
 	private TupleExpr assignPredicates(
-			List<String> assign, StatementPattern source) {
+			List<String> assign, StatementPattern source,
+			List<QueryModelNode> next) {
 		if (assign.isEmpty()) {
 			return source;
 		}
@@ -72,7 +74,7 @@ public class PredicateVariable extends AbstractRule {
 		for (String a : assign) {
 			p2 = new ConstVar(vf.createURI(a));
 			sp = new StatementPattern(s, p2, o, c);
-			visitNext(sp);
+			next.add(sp);
 			union.add(new Extension(
 				sp,
 				new ExtensionElem(
@@ -83,12 +85,13 @@ public class PredicateVariable extends AbstractRule {
 	}
 	
 	@Override
-	public void apply(StatementPattern node) {
+	public List<QueryModelNode> apply(StatementPattern node) {
+		List<QueryModelNode> next = newNextList();
 		StatementPattern left = node.clone();
-		visitNext(left);
-		TupleExpr right = assignPredicates(predicates, node.clone());
-		node.replaceWith(
-			new Union(left, right));
+		next.add(left);
+		TupleExpr right = assignPredicates(predicates, node.clone(), next);
+		node.replaceWith(new Union(left, right));
+		return next;
 	}
 	
 	@Override

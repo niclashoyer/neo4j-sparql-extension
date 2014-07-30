@@ -78,7 +78,6 @@ public class SPARQLInferenceTest {
 		SailRepository repository = new SailRepository(new MemoryStore());
 		repository.initialize();
 		SailRepositoryConnection conn = repository.getConnection();
-		ValueFactory vf = conn.getValueFactory();
 		conn.add(
 			getResource("/inference/kiel/manifest.ttl"),
 			"file:///inference/kiel/",

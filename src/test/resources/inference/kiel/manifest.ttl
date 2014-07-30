@@ -52,5 +52,14 @@
          mf:action  [ qt:query  <query-op-05.rq> ; qt:data   <data-op-01.ttl> ] ;
          mf:result  <result-op-05.rdf> .
 
+:kiel-inv-01 a mf:QueryEvaluationTest;
+	 mf:name "inv-01" ;
+         rdfs:comment "inverse object property" ;
+         mf:action  [ qt:query  <query-inv-01.rq> ; qt:data   <data-inv-01.ttl> ] ;
+         mf:result  <result-inv-01.rdf> .
 
-
+:kiel-inv-02 a mf:QueryEvaluationTest;
+	 mf:name "inv-02" ;
+         rdfs:comment "inverse object properties combined" ;
+         mf:action  [ qt:query  <query-inv-02.rq> ; qt:data   <data-inv-01.ttl> ] ;
+         mf:result  <result-inv-02.rdf> .
