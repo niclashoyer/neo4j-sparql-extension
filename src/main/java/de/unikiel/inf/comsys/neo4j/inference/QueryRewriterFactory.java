@@ -25,7 +25,7 @@ import org.semanticweb.owlapi.model.IRI;
 
 public class QueryRewriterFactory {
 
-	public final String ontologyContext;
+	private final String ontologyContext;
 
 	private static final WeakHashMap<SailRepository, QueryRewriterFactory> map
 			= new WeakHashMap<>();
@@ -155,6 +155,10 @@ public class QueryRewriterFactory {
 			inst = map.get(rep);
 		}
 		return inst;
+	}
+	
+	public String getOntologyContext() {
+		return this.ontologyContext;
 	}
 
 }
