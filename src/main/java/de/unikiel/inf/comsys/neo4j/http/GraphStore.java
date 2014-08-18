@@ -217,6 +217,10 @@ public class GraphStore extends AbstractSailsResource {
 			if (graphString != null) {
 				Resource ctx = vf.createURI(graphString);
 				conn.clear(ctx);
+				QueryRewriterFactory qr = QueryRewriterFactory.getInstance(rep);
+				if (ctx.stringValue().equals(qr.getOntologyContext())) {
+					qr.updateOntology(conn);
+				}
 			} else {
 				conn.clear();
 			}
