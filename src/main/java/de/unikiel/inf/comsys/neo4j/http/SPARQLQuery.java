@@ -1,17 +1,18 @@
 
 package de.unikiel.inf.comsys.neo4j.http;
 
-import de.unikiel.inf.comsys.neo4j.inference.QueryRewriterFactory;
 import de.unikiel.inf.comsys.neo4j.SPARQLExtensionProps;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLGraphStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLResultStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.inference.QueryRewriter;
+import de.unikiel.inf.comsys.neo4j.inference.QueryRewriterFactory;
 import java.nio.charset.Charset;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -105,6 +106,54 @@ public class SPARQLQuery extends AbstractSailsResource {
 			String queryString) {
 		return handleQuery(
 			req, uriInfo, queryString, defgraphs, namedgraphs, inference);
+	}
+	
+    @GET
+	@Path("/inference")
+    @Produces({
+		RDFMediaType.SPARQL_RESULTS_JSON,
+		RDFMediaType.SPARQL_RESULTS_XML,
+		RDFMediaType.SPARQL_RESULTS_CSV,
+		RDFMediaType.SPARQL_RESULTS_TSV,
+		RDFMediaType.RDF_TURTLE,
+		RDFMediaType.RDF_NTRIPLES,
+		RDFMediaType.RDF_XML,
+		RDFMediaType.RDF_JSON
+	})
+    public Response queryInference(
+			@Context Request req,
+			@Context UriInfo uriInfo,
+			@QueryParam("query") String queryString,
+			@QueryParam("default-graph-uri") List<String> defgraphs,
+			@QueryParam("named-graph-uri") List<String> namedgraphs) {
+		return handleQuery(
+			req, uriInfo, queryString, defgraphs, namedgraphs, "true");
+    }
+	
+	@POST
+	@Path("/inference")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response queryPOSTEncodedInference(
+			@Context Request req,
+			@Context UriInfo uriInfo,
+			@FormParam("query") String queryString,
+			@FormParam("default-graph-uri") List<String> defgraphs,
+			@FormParam("named-graph-uri") List<String> namedgraphs) {
+		return handleQuery(
+			req, uriInfo, queryString, defgraphs, namedgraphs, "true");
+	}
+
+	@POST
+	@Path("/inference")
+	@Consumes(RDFMediaType.SPARQL_QUERY)
+	public Response queryPOSTDirectInference(
+			@Context Request req,
+			@Context UriInfo uriInfo,
+			@QueryParam("default-graph-uri") List<String> defgraphs,
+			@QueryParam("named-graph-uri") List<String> namedgraphs,
+			String queryString) {
+		return handleQuery(
+			req, uriInfo, queryString, defgraphs, namedgraphs, "true");
 	}
 	
 	private Response handleQuery (

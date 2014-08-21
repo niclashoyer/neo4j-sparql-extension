@@ -2,6 +2,7 @@
 package de.unikiel.inf.comsys.neo4j.http;
 
 import de.unikiel.inf.comsys.neo4j.http.streams.RDFStreamingOutput;
+import de.unikiel.inf.comsys.neo4j.inference.QueryRewriterFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -180,6 +181,10 @@ public class GraphStore extends AbstractSailsResource {
 					conn.clear(dctx);
 				}
 				conn.add(in, base, format, dctx);
+				QueryRewriterFactory qr = QueryRewriterFactory.getInstance(rep);
+				if (dctx.stringValue().equals(qr.getOntologyContext())) {
+					qr.updateOntology(conn);
+				}
 			} else {
 				if (clear) {
 					conn.clear();
@@ -212,6 +217,10 @@ public class GraphStore extends AbstractSailsResource {
 			if (graphString != null) {
 				Resource ctx = vf.createURI(graphString);
 				conn.clear(ctx);
+				QueryRewriterFactory qr = QueryRewriterFactory.getInstance(rep);
+				if (ctx.stringValue().equals(qr.getOntologyContext())) {
+					qr.updateOntology(conn);
+				}
 			} else {
 				conn.clear();
 			}
