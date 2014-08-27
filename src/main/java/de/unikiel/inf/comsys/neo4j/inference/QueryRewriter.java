@@ -59,9 +59,7 @@ public class QueryRewriter {
 		TupleExpr expr = parsed.getTupleExpr();
 		RuleTransformationVisitor visitor =
 				new RuleTransformationVisitor(vf, rules);
-		System.out.println(expr);
 		expr.visit(visitor);
-		System.out.println(expr);
 		return new SailTupleExprQuery(
 				new ParsedTupleQuery(expr), conn);
 	}
