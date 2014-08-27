@@ -13,22 +13,30 @@ import java.net.ServerSocket;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
+import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
 
 public class RDFServerExtensionTest {
 	protected static CommunityNeoServer server;
 	protected static RepositoryConnection conn;
 
-	@BeforeClass
-	public static void setUp() throws IOException, RepositoryException, RDFParseException {
+	public static void setUp() throws Exception {
+		setUp(null, null);
+	}
+	
+	public static void setUp(String testdatastr)
+			throws Exception {
+		setUp(testdatastr, null);
+	}
+	
+	public static void setUp(String testdatastr, String tboxdatastr)
+			throws Exception {
 		int port;
 		try (final ServerSocket serverSocket = new ServerSocket(0)) {
 			port = serverSocket.getLocalPort();
@@ -41,12 +49,28 @@ public class RDFServerExtensionTest {
 		GraphDatabaseService db = server.getDatabase().getGraph();
 		Repository rep = RepositoryRegistry.getInstance(db).getRepository();
 		conn = rep.getConnection();
-		InputStream testdata = RDFServerExtensionTest.class.getResourceAsStream("/sp2b.n3");
-		conn.add(testdata, "http://example.com/", RDFFormat.N3);
+		if (testdatastr != null) {
+			InputStream testdata =
+				RDFServerExtensionTest.class.getResourceAsStream(testdatastr);
+			conn.add(
+				testdata,
+				"http://example.com/",
+				RDFFormat.forFileName(testdatastr));
+		}
+		if (tboxdatastr != null) {
+			InputStream testdata =
+				RDFServerExtensionTest.class.getResourceAsStream(tboxdatastr);
+			URI ctx = conn.getValueFactory().createURI("urn:ontology");
+			conn.add(
+				testdata,
+				"http://example.com/",
+				RDFFormat.forFileName(tboxdatastr),
+				ctx);
+		}
 	}
 
 	@AfterClass
-	public static void tearDown() throws RepositoryException {
+	public void tearDown() throws RepositoryException {
 		try {
 			Thread.sleep(3000l);
 		} catch (InterruptedException ex) {

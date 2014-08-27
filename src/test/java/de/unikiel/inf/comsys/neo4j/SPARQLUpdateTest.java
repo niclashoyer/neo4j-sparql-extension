@@ -5,11 +5,14 @@ import com.sun.jersey.api.representation.Form;
 import de.unikiel.inf.comsys.neo4j.http.RDFMediaType;
 import javax.ws.rs.core.MediaType;
 import static org.junit.Assert.*;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class SPARQLUpdateTest extends RDFServerExtensionTest {
 	
-	public SPARQLUpdateTest() {
+	@BeforeClass
+	public static void setUp() throws Exception {
+		RDFServerExtensionTest.setUp("/sp2b.n3");
 	}
 
 	@Test

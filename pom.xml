@@ -17,6 +17,8 @@
         <jackson.version>1.9.13</jackson.version>
         <owlapi.version>3.5.0</owlapi.version>
         <rs-api.version>2.0.1</rs-api.version>
+        <junit-benchmarks.version>0.7.2</junit-benchmarks.version>
+        <fuseki.version>1.1.0</fuseki.version>
     </properties>
     <licenses>
         <license>
@@ -204,6 +206,18 @@
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-distribution</artifactId>
             <version>${owlapi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>junit-benchmarks</artifactId>
+            <version>${junit-benchmarks.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-fuseki</artifactId>
+                <version>${fuseki.version}</version>
+                <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
