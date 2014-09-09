@@ -31,21 +31,24 @@ public class RepositoryRegistry {
 			throws RepositoryException {
 		initRio();
 		Graph graph = new Neo4j2Graph(database);
-		Sail sail = new GraphSail((KeyIndexableGraph) graph);
+		String patterns = SPARQLExtensionProps.getProperty("query.patterns");
+		Sail sail = new GraphSail((KeyIndexableGraph) graph, patterns);
 		this.rep = new SailRepository(sail);
 		rep.initialize();
 	}
  
-    public static synchronized RepositoryRegistry getInstance(
+    public static RepositoryRegistry getInstance(
 		GraphDatabaseService database) throws RepositoryException {
 		RepositoryRegistry inst;
         if (!map.containsKey(database)) {
-			inst = new RepositoryRegistry(database);
-			map.put(database, inst);
-        } else {
-			inst = map.get(database);
-		}
-        return inst;
+			synchronized(RepositoryRegistry.class) {
+				if (!map.containsKey(database)) {
+					inst = new RepositoryRegistry(database);
+					map.put(database, inst);
+				}
+			}
+        }
+        return map.get(database);
     }
 	
 	public SailRepository getRepository() {
