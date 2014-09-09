@@ -10,6 +10,10 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.RDFParserFactory;
+import org.openrdf.rio.RDFParserRegistry;
+import org.openrdf.rio.turtle.TurtleParserFactory;
 
 public abstract class AbstractSailsResource {
 	
@@ -38,6 +42,10 @@ public abstract class AbstractSailsResource {
 			case RDFMediaType.RDF_JSON:
 				return RDFFormat.RDFJSON;
 		}
+	}
+	
+	protected RDFParser getRDFParser(RDFFormat format) {
+		return RDFParserRegistry.getInstance().get(format).getParser();
 	}
 	
 	protected SailRepositoryConnection getConnection() throws RepositoryException {

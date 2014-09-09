@@ -1,6 +1,8 @@
 
 package de.unikiel.inf.comsys.neo4j.http;
 
+import de.unikiel.inf.comsys.neo4j.http.streams.ChunkedCommitHandler;
+import de.unikiel.inf.comsys.neo4j.SPARQLExtensionProps;
 import de.unikiel.inf.comsys.neo4j.http.streams.RDFStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.inference.QueryRewriterFactory;
 import java.io.IOException;
@@ -31,15 +33,20 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.RDFParser;
 
 public class GraphStore extends AbstractSailsResource {
 
 	private final ValueFactory vf;
+	private final long chunksize;
 	
 	public GraphStore(SailRepository rep) {
 		super(rep);
 		this.vf = rep.getValueFactory();
+		String chunksizeStr = SPARQLExtensionProps.getProperty("chunksize");
+		chunksize = Long.parseLong(chunksizeStr);
 	}
 	
 	@GET
@@ -68,8 +75,9 @@ public class GraphStore extends AbstractSailsResource {
 			@HeaderParam("Content-Type") MediaType type,
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
+			@QueryParam("chunked") String chunked,
 			InputStream in) {
-		return handleAdd(uriInfo, type, graphString, def, in, true);
+		return handleAdd(uriInfo, type, graphString, def, in, chunked, true);
 	}
 	
 	@DELETE
@@ -91,8 +99,9 @@ public class GraphStore extends AbstractSailsResource {
 			@HeaderParam("Content-Type") MediaType type,
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def,
+			@QueryParam("chunked") String chunked,
 			InputStream in) {
-		return handleAdd(uriInfo, type, graphString, def, in, false);
+		return handleAdd(uriInfo, type, graphString, def, in, chunked, false);
 	}
 	
 	@GET
@@ -122,9 +131,10 @@ public class GraphStore extends AbstractSailsResource {
 	public Response graphDirectPut(
 			@Context UriInfo uriInfo,
 			@HeaderParam("Content-Type") MediaType type,
+			@QueryParam("chunked") String chunked,
 			InputStream in) {
 		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
-		return handleAdd(uriInfo, type, graphuri, null, in, true);
+		return handleAdd(uriInfo, type, graphuri, null, in, chunked, true);
 	}
 	
 	@DELETE
@@ -145,9 +155,10 @@ public class GraphStore extends AbstractSailsResource {
 	public Response graphDirectPost(
 			@Context UriInfo uriInfo,
 			@HeaderParam("Content-Type") MediaType type,
+			@QueryParam("chunked") String chunked,
 			InputStream in) {
 			String graphuri = uriInfo.getAbsolutePath().toASCIIString();
-		return handleAdd(uriInfo, type, graphuri, null, in, false);
+		return handleAdd(uriInfo, type, graphuri, null, in, chunked, false);
 	}
 	
 	private Response handleAdd(
@@ -156,6 +167,7 @@ public class GraphStore extends AbstractSailsResource {
 			String graphString,
 			String def,
 			InputStream in,
+			String chunkedStr,
 			boolean clear) {
 		SailRepositoryConnection conn;
 		try {
@@ -164,6 +176,7 @@ public class GraphStore extends AbstractSailsResource {
 			throw new WebApplicationException(ex);
 		}
 		try {
+			boolean chunked = chunkedStr != null && chunkedStr.equals("true");
 			Resource dctx = null;
 			String base = uriInfo.getAbsolutePath().toASCIIString();
 			if (graphString != null) {
@@ -180,7 +193,7 @@ public class GraphStore extends AbstractSailsResource {
 				if (clear) {
 					conn.clear(dctx);
 				}
-				conn.add(in, base, format, dctx);
+				addToGraphstore(conn, in, base, format, dctx, chunked);
 				QueryRewriterFactory qr = QueryRewriterFactory.getInstance(rep);
 				if (dctx.stringValue().equals(qr.getOntologyContext())) {
 					qr.updateOntology(conn);
@@ -189,7 +202,7 @@ public class GraphStore extends AbstractSailsResource {
 				if (clear) {
 					conn.clear();
 				}
-				conn.add(in, base, format);
+				addToGraphstore(conn, in, base, format, null, chunked);
 			}
 			conn.commit();
 			close(conn);
@@ -199,9 +212,31 @@ public class GraphStore extends AbstractSailsResource {
 			close(conn, ex);
 			return Response.status(400).entity(
 					str.getBytes(Charset.forName("UTF-8"))).build();
-		} catch(IOException | RepositoryException ex) {
+		} catch(IOException | RepositoryException | RDFHandlerException ex) {
 			close(conn, ex);
 			throw new WebApplicationException(ex);
+		}
+	}
+	
+	private void addToGraphstore(
+			RepositoryConnection conn,
+			InputStream in,
+			String base,
+			RDFFormat format,
+			Resource dctx,
+			boolean chunked) throws IOException, RDFParseException,
+			RDFHandlerException, RepositoryException {
+		if (chunked) {
+			RDFParser parser = getRDFParser(format);
+			parser.setRDFHandler(
+				new ChunkedCommitHandler(conn, chunksize, dctx));
+			parser.parse(in, base);
+		} else {
+			if (dctx != null) {
+				conn.add(in, base, format, dctx);
+			} else {
+				conn.add(in, base, format);
+			}
 		}
 	}
 	
