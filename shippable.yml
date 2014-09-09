@@ -8,6 +8,6 @@ install:
 script:
   - mvn cobertura:cobertura
 after_script:
-  - mkdir -p shippable/restresults shippable/codecoverage
+  - mkdir -p shippable/testresults shippable/codecoverage
   - cp -r target/surefire-reports/* shippable/testresults/
   - cp -r target/site/cobertura/* shippable/codecoverage/
