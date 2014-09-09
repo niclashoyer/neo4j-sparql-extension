@@ -94,11 +94,14 @@ public class QueryRewriterFactory {
 							} catch (RepositoryException ex1) {
 								ex.addSuppressed(ex1);
 							}
-							logger.log(
-									Level.WARNING,
-									"Error while exporting ontology",
-									ex);
-							System.out.println("[ERROR] " + ex);
+							if (!(ex instanceof RDFHandlerException &&
+								ex.getCause() instanceof IOException &&
+								ex.getCause().getMessage().equals("Pipe closed"))) {
+								logger.log(
+										Level.WARNING,
+										"Error while exporting ontology",
+										ex);	
+							}
 						}
 					}
 				};

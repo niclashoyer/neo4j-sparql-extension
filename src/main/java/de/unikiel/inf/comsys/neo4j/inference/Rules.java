@@ -29,10 +29,8 @@ public class Rules {
 	public static List<Rule> fromOntology(OWLOntologyDocumentSource src) {
 		try {
 			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-			System.out.println("[RULES] Loading ontology...");
 			manager.loadOntologyFromOntologyDocument(src);
 			Set<OWLOntology> ontologies = manager.getOntologies();
-			System.out.println("[RULES] Ontologies loaded: " + ontologies.size());
 			if (ontologies.isEmpty()) {
 				return Collections.EMPTY_LIST;
 			} else {
@@ -70,16 +68,8 @@ public class Rules {
 		extractors.add(new SubObjectPropertyOfExtractor());
 		extractors.add(new SymmetricPropertyExtractor());
 		extractors.add(new TransitiveObjectPropertyExtractor());
-		System.out.println("== AXIOMS ==");
-		for (OWLAxiom a : ot.getAxioms()) {
-			System.out.println(a);
-		}
 		for (Extractor extr : extractors) {
 			list.addAll(extr.extract(ot));
-		}
-		System.out.println("== RULES ==");
-		for (Rule r : list) {
-			System.out.println(r);
 		}
 		return list;
 	}
