@@ -2,8 +2,9 @@
 package de.unikiel.inf.comsys.neo4j.http;
 
 import de.unikiel.inf.comsys.neo4j.SPARQLExtensionProps;
+import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLBooleanStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLGraphStreamingOutput;
-import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLResultStreamingOutput;
+import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLTupleStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.inference.QueryRewriter;
 import de.unikiel.inf.comsys.neo4j.inference.QueryRewriterFactory;
 import java.nio.charset.Charset;
@@ -23,14 +24,19 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
+import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.Query;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
+import org.openrdf.query.resultio.BooleanQueryResultWriterFactory;
 import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
+import org.openrdf.query.resultio.sparqljson.SPARQLBooleanJSONWriterFactory;
 import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
+import org.openrdf.query.resultio.sparqlxml.SPARQLBooleanXMLWriterFactory;
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriterFactory;
+import org.openrdf.query.resultio.text.BooleanTextWriterFactory;
 import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriterFactory;
 import org.openrdf.query.resultio.text.tsv.SPARQLResultsTSVWriterFactory;
 import org.openrdf.repository.RepositoryException;
@@ -42,6 +48,7 @@ import org.openrdf.rio.RDFWriterRegistry;
 public class SPARQLQuery extends AbstractSailsResource {
 	
 	private final List<Variant> queryResultVariants;
+	private final List<Variant> booleanResultVariants;
 	private final RDFWriterRegistry registry;
 	private final QueryRewriterFactory qwfactory;
 	private final int timeout;
@@ -53,6 +60,11 @@ public class SPARQLQuery extends AbstractSailsResource {
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_XML),
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_CSV),
 			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_TSV)
+		).add().build();
+		booleanResultVariants = Variant.mediaTypes(
+			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_JSON),
+			MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_XML),
+			MediaType.valueOf(MediaType.TEXT_PLAIN)
 		).add().build();
 		this.registry  = RDFWriterRegistry.getInstance();
 		this.qwfactory = QueryRewriterFactory.getInstance(rep);
@@ -184,10 +196,17 @@ public class SPARQLQuery extends AbstractSailsResource {
 			}
 			query.setMaxQueryTime(timeout);
 			final List<Variant> acceptable;
-			boolean isGraphQuery = false;
+			boolean isGraphQuery   = false;
+			boolean isBooleanQuery = false;
 			if (query instanceof GraphQuery) {
-				acceptable = rdfResultVariants;
 				isGraphQuery = true;
+			} else if (query instanceof BooleanQuery) {
+				isBooleanQuery = true;
+			}
+			if (isGraphQuery) {
+				acceptable = rdfResultVariants;
+			} else if (isBooleanQuery) {
+				acceptable = booleanResultVariants;
 			} else {
 				acceptable = queryResultVariants;
 			}
@@ -202,11 +221,17 @@ public class SPARQLQuery extends AbstractSailsResource {
 			if (isGraphQuery) {
 				GraphQuery gq = (GraphQuery) query;
 				stream = new SPARQLGraphStreamingOutput(gq, factory, conn);				
+			} else if (isBooleanQuery) {
+				BooleanQuery bq = (BooleanQuery) query;
+				stream = new SPARQLBooleanStreamingOutput(
+						bq,
+						getBooleanWriterFactory(mtstr),
+						conn);
 			} else {
 				TupleQuery tq = (TupleQuery) query;
-				stream = new SPARQLResultStreamingOutput(
+				stream = new SPARQLTupleStreamingOutput(
 					tq,
-					getResultWriterFactory(mtstr),
+					getTupleWriterFactory(mtstr),
 					conn);
 			}
 			return Response.ok(stream).type(mt).build();
@@ -221,7 +246,7 @@ public class SPARQLQuery extends AbstractSailsResource {
 		}
     }
 	
-	private TupleQueryResultWriterFactory getResultWriterFactory(String mimetype) {
+	private TupleQueryResultWriterFactory getTupleWriterFactory(String mimetype) {
 		switch (mimetype) {
 			default:
 			case RDFMediaType.SPARQL_RESULTS_JSON:
@@ -232,6 +257,18 @@ public class SPARQLQuery extends AbstractSailsResource {
 				return new SPARQLResultsCSVWriterFactory();
 			case RDFMediaType.SPARQL_RESULTS_TSV:
 				return new SPARQLResultsTSVWriterFactory();
+		}
+	}
+	
+	private BooleanQueryResultWriterFactory getBooleanWriterFactory(String mimetype) {
+		switch (mimetype) {
+			default:
+			case RDFMediaType.SPARQL_RESULTS_JSON:
+				return new SPARQLBooleanJSONWriterFactory();
+			case RDFMediaType.SPARQL_RESULTS_XML:
+				return new SPARQLBooleanXMLWriterFactory();
+			case MediaType.TEXT_PLAIN:
+				return new BooleanTextWriterFactory();
 		}
 	}
 }

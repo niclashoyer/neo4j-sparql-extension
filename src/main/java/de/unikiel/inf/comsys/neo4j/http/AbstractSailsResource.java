@@ -11,9 +11,7 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.RDFParserFactory;
 import org.openrdf.rio.RDFParserRegistry;
-import org.openrdf.rio.turtle.TurtleParserFactory;
 
 public abstract class AbstractSailsResource {
 	
