@@ -17,6 +17,7 @@
         <jackson.version>1.9.13</jackson.version>
         <owlapi.version>3.5.0</owlapi.version>
         <rs-api.version>2.0.1</rs-api.version>
+        <guava.version>18.0</guava.version>
     </properties>
     <licenses>
         <license>
@@ -198,7 +199,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>17.0</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
