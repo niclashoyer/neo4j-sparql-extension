@@ -5,7 +5,7 @@
 [![License](http://img.shields.io/badge/license-GPLv3-lightgrey.svg?style=flat)](LICENSE)
 [![Releases](http://img.shields.io/badge/release-0.4.1-blue.svg?style=flat)](https://github.com/niclashoyer/neo4j-sparql-extension/releases)
 [![Neo4j](http://img.shields.io/badge/Neo4j-2.1.3-77CE56.svg?style=flat)](http://www.neo4j.org/)
-[![Gittip](http://img.shields.io/gittip/niclashoyer.svg?style=flat)](https://www.gittip.com/niclashoyer/)
+[![Gittip](http://img.shields.io/gratipay/niclashoyer.svg?style=flat)](https://www.gittip.com/niclashoyer/)
 
 Neo4j [unmanaged extension](http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html)
 for [RDF](http://www.w3.org/TR/rdf-primer/) storage and
