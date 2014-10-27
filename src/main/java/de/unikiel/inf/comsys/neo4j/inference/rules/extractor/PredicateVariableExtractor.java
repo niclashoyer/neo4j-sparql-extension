@@ -3,7 +3,7 @@ package de.unikiel.inf.comsys.neo4j.inference.rules.extractor;
 
 import de.unikiel.inf.comsys.neo4j.inference.Rule;
 import de.unikiel.inf.comsys.neo4j.inference.rules.PredicateVariable;
-import de.unikiel.inf.comsys.neo4j.inference.rules.SubObjectPropertyOf;
+import de.unikiel.inf.comsys.neo4j.inference.rules.SubPropertyOf;
 import java.util.ArrayList;
 import java.util.List;
 import org.openrdf.model.vocabulary.OWL;
@@ -28,7 +28,7 @@ public class PredicateVariableExtractor extends AbstractExtractor {
 			if (e.isOWLObjectProperty()) {
 				op = getString(e.asOWLObjectProperty());
 				ps.add(op);
-				list.add(new SubObjectPropertyOf(op, OWLTOPPROP));
+				list.add(new SubPropertyOf(op, OWLTOPPROP));
 			}
 		}
 		list.add(new PredicateVariable(ps));

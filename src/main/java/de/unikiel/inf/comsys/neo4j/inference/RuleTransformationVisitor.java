@@ -3,7 +3,6 @@ package de.unikiel.inf.comsys.neo4j.inference;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.algebra.QueryModelNode;
