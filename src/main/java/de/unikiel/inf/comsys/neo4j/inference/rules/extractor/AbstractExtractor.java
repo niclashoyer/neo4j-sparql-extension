@@ -6,16 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
 public abstract class AbstractExtractor implements Extractor {
 	
 	protected static String getString(OWLClassExpression clazz) {
-		return ((OWLClass) clazz).getIRI().toURI().toASCIIString(); // FIXME: catch errors
+		return ((OWLClass) clazz).getIRI().toURI().toASCIIString();
 	}
 	
 	protected static String getString(OWLObjectPropertyExpression property) {
-		return property.getNamedProperty().getIRI().toURI().toASCIIString(); // FIXME: catch errors
+		return property.getNamedProperty().getIRI().toURI().toASCIIString();
+	}
+	
+	protected static String getString(OWLDataPropertyExpression property) {
+		return property.asOWLDataProperty().getIRI().toURI().toASCIIString();
 	}
 	
 	protected static List<String> getStrings(List<OWLObjectPropertyExpression> properties) {

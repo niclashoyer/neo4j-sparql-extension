@@ -7,12 +7,12 @@ import org.openrdf.query.algebra.QueryModelNode;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.Union;
 
-public class SubObjectPropertyOf extends AbstractRule {
+public class SubPropertyOf extends AbstractRule {
 	
 	private final String op1;
 	private final String op2;
 	
-	public SubObjectPropertyOf(String op1, String op2) {
+	public SubPropertyOf(String op1, String op2) {
 		this.op1 = op1;
 		this.op2 = op2;
 	}
@@ -42,7 +42,7 @@ public class SubObjectPropertyOf extends AbstractRule {
 	
 	@Override
 	public String toString() {
-		return "SubObjectPropertyOf(<" + op1 + "> <" + op2 + ">)";
+		return "SubPropertyOf(<" + op1 + "> <" + op2 + ">)";
 	}
 	
 }

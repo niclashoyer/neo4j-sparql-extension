@@ -1,5 +1,5 @@
 
-package de.unikiel.inf.comsys.neo4j.inference;
+package de.unikiel.inf.comsys.neo4j.inference.sail;
 
 import org.openrdf.query.parser.ParsedGraphQuery;
 import org.openrdf.repository.sail.SailGraphQuery;

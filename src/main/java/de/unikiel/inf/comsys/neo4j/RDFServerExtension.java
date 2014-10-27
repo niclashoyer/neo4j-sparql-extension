@@ -12,34 +12,34 @@ import org.openrdf.sail.SailException;
 
 @Path("/")
 public class RDFServerExtension {
-	
+
 	private final SPARQLQuery query;
 	private final SPARQLUpdate update;
 	private final GraphStore graphStore;
 
-    public RDFServerExtension(@Context GraphDatabaseService database)
+	public RDFServerExtension(@Context GraphDatabaseService database)
 			throws SailException, RepositoryException {
 		SailRepository rep = RepositoryRegistry
-			.getInstance(database)
-			.getRepository();
+				.getInstance(database)
+				.getRepository();
 		query = new SPARQLQuery(rep);
 		update = new SPARQLUpdate(rep);
 		graphStore = new GraphStore(rep);
 	}
-	
-    @Path("/query")
-    public SPARQLQuery query() {
+
+	@Path("/query")
+	public SPARQLQuery query() {
 		return query;
-    }
-	
+	}
+
 	@Path("/update")
 	public SPARQLUpdate update() {
-			return update;
+		return update;
 	}
-	
+
 	@Path("/graph")
 	public GraphStore graph() {
-			return graphStore;
+		return graphStore;
 	}
-	
+
 }
