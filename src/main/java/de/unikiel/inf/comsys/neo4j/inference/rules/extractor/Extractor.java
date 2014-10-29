@@ -1,5 +1,5 @@
 
-package de.unikiel.inf.comsys.neo4j.inference.rules;
+package de.unikiel.inf.comsys.neo4j.inference.rules.extractor;
 
 import de.unikiel.inf.comsys.neo4j.inference.Rule;
 import java.util.List;
