@@ -2,7 +2,6 @@
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
 import com.google.common.base.Joiner;
-import de.unikiel.inf.comsys.neo4j.inference.algebra.ConstVar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

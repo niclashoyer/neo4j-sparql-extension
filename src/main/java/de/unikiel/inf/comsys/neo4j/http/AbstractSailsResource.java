@@ -28,6 +28,12 @@ public abstract class AbstractSailsResource {
 		).add().build();
 	}
 	
+	/**
+	 * Returns an instance of {@link org.openrdf.rio.RDFFormat} for a given
+	 * MIME-Type string.
+	 * @param mimetype the MIME-Type as string
+	 * @return the corresponding RDF-Format
+	 */
 	protected RDFFormat getRDFFormat(String mimetype) {
 		switch(mimetype) {
 			default:
@@ -42,14 +48,31 @@ public abstract class AbstractSailsResource {
 		}
 	}
 	
+	/**
+	 * Returns the corresponding RDF parser for a given RDF format.
+	 * @param format the RDF format
+	 * @return RDF parser
+	 */
 	protected RDFParser getRDFParser(RDFFormat format) {
 		return RDFParserRegistry.getInstance().get(format).getParser();
 	}
 	
+	/**
+	 * Returns a new connection for the current repository.
+	 * @return a new connection
+	 * @throws RepositoryException if there was a problem getting the connection
+	 */
 	protected SailRepositoryConnection getConnection() throws RepositoryException {
 		return rep.getConnection();
 	}
 	
+	/**
+	 * Closes a repository connection if it is open. Does nothing if it is
+	 * already closed.
+	 * @param conn the connection to close
+	 * @throws WebApplicationException if there was a problem while closing the
+	 * connection
+	 */
 	protected void close(RepositoryConnection conn) {
 		if (conn != null) {
 			try {
@@ -62,6 +85,13 @@ public abstract class AbstractSailsResource {
 		}
 	}
 	
+	/**
+	 * Closes a repository connection it it is open. Does nothing if it is
+	 * closed. If an exception occurs while closing the connection it will
+	 * be added as suppressed exception to the given exception.
+	 * @param conn the connection to close
+	 * @param ex an exception that caused the closing of the connection
+	 */
 	protected void close(RepositoryConnection conn, Exception ex) {
 		if (conn != null) {
 			try {

@@ -1,7 +1,6 @@
 
 package de.unikiel.inf.comsys.neo4j.inference.rules.extractor;
 
-import de.unikiel.inf.comsys.neo4j.inference.rules.Extractor;
 import java.util.ArrayList;
 import java.util.List;
 import org.semanticweb.owlapi.model.OWLClass;
