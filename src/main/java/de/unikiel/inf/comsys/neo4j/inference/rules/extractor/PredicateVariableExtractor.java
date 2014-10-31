@@ -14,13 +14,15 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 public class PredicateVariableExtractor extends AbstractExtractor {
 	
-	private static final String OWLTOPPROP = OWL.NAMESPACE + "topObjectProperty";
+	private static final String TOPOBJ = OWL.NAMESPACE + "topObjectProperty";
+	private static final String TOPDATA = OWL.NAMESPACE + "topDataProperty";
 	
 	@Override
 	public List<Rule> extract(OWLOntology ot) {
 		List<Rule> list = new ArrayList<>();
 		List<String> ps = new ArrayList<>();
-		ps.add(OWLTOPPROP);
+		ps.add(TOPOBJ);
+		ps.add(TOPDATA);
 		OWLEntity e;
 		String op;
 		for (OWLDeclarationAxiom a : ot.getAxioms(AxiomType.DECLARATION)) {
@@ -28,7 +30,11 @@ public class PredicateVariableExtractor extends AbstractExtractor {
 			if (e.isOWLObjectProperty()) {
 				op = getString(e.asOWLObjectProperty());
 				ps.add(op);
-				list.add(new SubPropertyOf(op, OWLTOPPROP));
+				list.add(new SubPropertyOf(op, TOPOBJ));
+			} else if (e.isOWLDataProperty()) {
+				op = getString(e.asOWLDataProperty());
+				ps.add(op);
+				list.add(new SubPropertyOf(op, TOPDATA));
 			}
 		}
 		list.add(new PredicateVariable(ps));
