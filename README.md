@@ -49,7 +49,7 @@ The default configuration is as follows:
 ```
 de.unikiel.inf.comsys.neo4j.query.timeout = 120
 de.unikiel.inf.comsys.neo4j.query.patterns = p,c,pc
-de.unikiel.inf.comsys.neo4j.inference.graph = urn:sparqlextension:ontology
+de.unikiel.inf.comsys.neo4j.inference.graph = urn:sparqlextension:tbox
 ```
 
 ## License
