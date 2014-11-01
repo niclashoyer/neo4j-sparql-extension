@@ -194,10 +194,6 @@ public class GraphStore extends AbstractSailsResource {
 					conn.clear(dctx);
 				}
 				addToGraphstore(conn, in, base, format, dctx, chunked);
-				QueryRewriterFactory qr = QueryRewriterFactory.getInstance(rep);
-				if (dctx.stringValue().equals(qr.getOntologyContext())) {
-					qr.updateOntology(conn);
-				}
 			} else {
 				if (clear) {
 					conn.clear();
@@ -205,6 +201,12 @@ public class GraphStore extends AbstractSailsResource {
 				addToGraphstore(conn, in, base, format, null, chunked);
 			}
 			conn.commit();
+			if (dctx != null) {
+				QueryRewriterFactory qr = QueryRewriterFactory.getInstance(rep);
+				if (dctx.stringValue().equals(qr.getOntologyContext())) {
+					qr.updateOntology(conn);
+				}
+			}
 			close(conn);
 			return Response.noContent().build();
 		} catch (RDFParseException ex) {

@@ -22,7 +22,6 @@ import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.turtle.TurtleWriterFactory;
 import org.semanticweb.owlapi.formats.TurtleDocumentFormat;
-import org.semanticweb.owlapi.formats.TurtleDocumentFormatFactory;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDocumentFormat;
