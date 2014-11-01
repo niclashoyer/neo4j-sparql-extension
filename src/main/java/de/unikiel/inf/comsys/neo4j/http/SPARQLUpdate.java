@@ -58,7 +58,7 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			throw new WebApplicationException(ex);
 		}
 		try {
-			if (query == null) {
+			if (query == null || query.length() == 0) {
 				throw new MalformedQueryException("empty query");
 			}
 			Update update = conn.prepareUpdate(QueryLanguage.SPARQL, query);
