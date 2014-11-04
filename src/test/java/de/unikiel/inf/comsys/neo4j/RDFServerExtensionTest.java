@@ -60,7 +60,7 @@ public class RDFServerExtensionTest {
 		if (tboxdatastr != null) {
 			InputStream testdata =
 				RDFServerExtensionTest.class.getResourceAsStream(tboxdatastr);
-			URI ctx = conn.getValueFactory().createURI("urn:ontology");
+			URI ctx = conn.getValueFactory().createURI("urn:sparqlextension:tbox");
 			conn.add(
 				testdata,
 				"http://example.com/",
@@ -70,7 +70,7 @@ public class RDFServerExtensionTest {
 	}
 
 	@AfterClass
-	public void tearDown() throws RepositoryException {
+	public static void tearDown() throws RepositoryException {
 		try {
 			Thread.sleep(3000l);
 		} catch (InterruptedException ex) {

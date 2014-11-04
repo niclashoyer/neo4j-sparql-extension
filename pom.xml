@@ -10,7 +10,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <neo4j.version>2.1.5</neo4j.version>
-        <blueprints.version>2.6.0</blueprints.version>
+        <blueprints.version>2.7.0-SNAPSHOT</blueprints.version>
         <sesame.version>2.7.10</sesame.version>
         <junit.version>4.11</junit.version>
         <jersey.version>1.9</jersey.version>
@@ -213,12 +213,6 @@
             <artifactId>junit-benchmarks</artifactId>
             <version>${junit-benchmarks.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>jena-fuseki</artifactId>
-                <version>${fuseki.version}</version>
-                <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
