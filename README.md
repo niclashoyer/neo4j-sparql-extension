@@ -1,11 +1,11 @@
 # neo4j-sparql-extension
 
-[![Build Status](https://api.shippable.com/projects/537d0049a90ec01102ee5abc/badge/master)](https://www.shippable.com/projects/537d0049a90ec01102ee5abc)
+[![Build Status](https://api.shippable.com/projects/540f1f2aec1d09a97e66f20d/badge?branchName=master)](https://app.shippable.com/projects/540f1f2aec1d09a97e66f20d/builds/latest)
 [![Dependency Status](https://www.versioneye.com/user/projects/539018d346c4731b13000040/badge.svg?style=flat)](https://www.versioneye.com/user/projects/539018d346c4731b13000040)
 [![License](http://img.shields.io/badge/license-GPLv3-lightgrey.svg?style=flat)](LICENSE)
 [![Releases](http://img.shields.io/badge/release-0.4.1-blue.svg?style=flat)](https://github.com/niclashoyer/neo4j-sparql-extension/releases)
-[![Neo4j](http://img.shields.io/badge/Neo4j-2.1.3-77CE56.svg?style=flat)](http://www.neo4j.org/)
-[![Gittip](http://img.shields.io/gittip/niclashoyer.svg?style=flat)](https://www.gittip.com/niclashoyer/)
+[![Neo4j](http://img.shields.io/badge/Neo4j-2.1.5-77CE56.svg?style=flat)](http://www.neo4j.org/)
+[![Gittip](http://img.shields.io/gratipay/niclashoyer.svg?style=flat)](https://www.gittip.com/niclashoyer/)
 
 Neo4j [unmanaged extension](http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html)
 for [RDF](http://www.w3.org/TR/rdf-primer/) storage and
@@ -48,7 +48,8 @@ The default configuration is as follows:
 
 ```
 de.unikiel.inf.comsys.neo4j.query.timeout = 120
-de.unikiel.inf.comsys.neo4j.inference.graph = urn:ontology
+de.unikiel.inf.comsys.neo4j.query.patterns = p,c,pc
+de.unikiel.inf.comsys.neo4j.inference.graph = urn:sparqlextension:tbox
 ```
 
 ## License

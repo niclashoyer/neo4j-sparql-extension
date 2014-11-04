@@ -1,6 +1,7 @@
 package de.unikiel.inf.comsys.neo4j.inference;
 
 import de.unikiel.inf.comsys.neo4j.SPARQLExtensionProps;
+import de.unikiel.inf.comsys.neo4j.http.RDFMediaType;
 import de.unikiel.inf.comsys.neo4j.http.SPARQLUpdate;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +21,10 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.turtle.TurtleWriterFactory;
+import org.semanticweb.owlapi.formats.TurtleDocumentFormat;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 
 public class QueryRewriterFactory {
 
@@ -94,11 +97,14 @@ public class QueryRewriterFactory {
 							} catch (RepositoryException ex1) {
 								ex.addSuppressed(ex1);
 							}
-							logger.log(
-									Level.WARNING,
-									"Error while exporting ontology",
-									ex);
-							System.out.println("[ERROR] " + ex);
+							if (!(ex instanceof RDFHandlerException &&
+								ex.getCause() instanceof IOException &&
+								ex.getCause().getMessage().equals("Pipe closed"))) {
+								logger.log(
+										Level.WARNING,
+										"Error while exporting ontology",
+										ex);	
+							}
 						}
 					}
 				};
@@ -111,6 +117,26 @@ public class QueryRewriterFactory {
 		@Override
 		public IRI getDocumentIRI() {
 			return iri;
+		}
+
+		@Override
+		public OWLDocumentFormat getFormat() {
+			return new TurtleDocumentFormat();
+		}
+
+		@Override
+		public boolean isFormatKnown() {
+			return true;
+		}
+
+		@Override
+		public String getMIMEType() {
+			return RDFMediaType.RDF_TURTLE;
+		}
+
+		@Override
+		public boolean isMIMETypeKnown() {
+			return true;
 		}
 
 	}

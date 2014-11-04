@@ -15,12 +15,12 @@ import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
-public class SPARQLResultStreamingOutput extends AbstractStreamingOutput {
+public class SPARQLTupleStreamingOutput extends AbstractStreamingOutput {
 
 	private final TupleQuery query;
 	private final TupleQueryResultWriterFactory factory;
 	
-	public SPARQLResultStreamingOutput(
+	public SPARQLTupleStreamingOutput(
 		TupleQuery query,
 		TupleQueryResultWriterFactory writerFactory,
 		RepositoryConnection conn) {

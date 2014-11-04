@@ -1,4 +1,4 @@
-package de.unikiel.inf.comsys.neo4j.inference.algebra;
+package de.unikiel.inf.comsys.neo4j.inference.rules;
 
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;

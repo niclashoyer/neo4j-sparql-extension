@@ -22,17 +22,16 @@ public class SPARQLUpdateTest extends RDFServerExtensionTest {
 			.get(ClientResponse.class);
 		assertEquals("Should return 405 response code", 405, res.getStatus());
 		Form f = new Form();
-		f.add("query", "");
+		f.add("update", "");
 		res = request("rdf/update")
 			.type(MediaType.APPLICATION_FORM_URLENCODED)
 			.entity(f)
 			.post(ClientResponse.class);
-		System.out.println(res.getEntity(String.class));
 		assertEquals("Should return 400 response code", 400, res.getStatus());
 		res = request("rdf/update")
 			.type(RDFMediaType.SPARQL_UPDATE)
 			.post(ClientResponse.class);
-		assertEquals("Should return 200 response code", 200, res.getStatus());
+		assertEquals("Should return 200 response code", 400, res.getStatus());
 	}
 	
 	@Test
@@ -43,6 +42,20 @@ public class SPARQLUpdateTest extends RDFServerExtensionTest {
 			.entity("foobar")
 			.post(ClientResponse.class);
 		assertEquals("Should return 400 response code", 400, res.getStatus());
+	}
+	
+	@Test
+	public void insert() {
+		ClientResponse res;
+		String query =
+			"PREFIX : <http://example.com/> " +
+			"INSERT DATA { :test a :Test }";
+		res = request("rdf/update")
+			.type(RDFMediaType.SPARQL_UPDATE)
+			.entity(query)
+			.post(ClientResponse.class);
+		System.out.println(res.getEntity(String.class));
+		assertEquals("Should return 200 response code", 200, res.getStatus());
 	}
 	
 }
