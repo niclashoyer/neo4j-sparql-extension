@@ -26,6 +26,12 @@ import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDocumentFormat;
 
+/**
+ * A factory for query rewriters.
+ *
+ * This factory ensures that for each given repository connection there exists
+ * at most one query rewriter.
+ */
 public class QueryRewriterFactory {
 
 	private final String ontologyContext;
@@ -40,11 +46,22 @@ public class QueryRewriterFactory {
 	private final ExecutorService executor;
 	private List<Rule> rules;
 
+	/**
+	 * Implements a document source for the use with OWL-API.
+	 *
+	 * This class implements a OWL-API document source, that exports the
+	 * contents of a graph in a Sesame repository. The OWL-API can't use a
+	 * Sesame repository directly, thus the graph is serialized in a separate
+	 * thread into Turtle and streamed to the OWL-API.
+	 */
 	private class RepositorySource implements OWLOntologyDocumentSource {
 
 		private final URI ctx;
 		private final IRI iri;
 
+		/**
+		 * Creates a new repository source.
+		 */
 		public RepositorySource() {
 			this.ctx = rep.getValueFactory().createURI(ontologyContext);
 			this.iri = IRI.create(ontologyContext);
@@ -65,9 +82,16 @@ public class QueryRewriterFactory {
 			return rep.isInitialized();
 		}
 
+		/**
+		 * Returns a input stream that streams a graph serialized in Turtle.
+		 *
+		 * @return input stream that streams the graph
+		 */
 		@Override
 		public InputStream getInputStream() {
 			if (isInputStreamAvailable()) {
+				// create a pipe to connect the output stream of the turtle
+				// serializer to the given input stream
 				final PipedOutputStream out;
 				final PipedInputStream in = new PipedInputStream(2048);
 				try {
@@ -75,21 +99,23 @@ public class QueryRewriterFactory {
 				} catch (IOException ex) {
 					throw new RuntimeException(ex);
 				}
+				// run serialization in separate thread
 				Runnable exporter = new Runnable() {
 					@Override
 					public void run() {
 						SailRepositoryConnection conn = null;
 						try {
-
 							conn = rep.getConnection();
 							TurtleWriterFactory factory
 									= new TurtleWriterFactory();
+							// export the graph as turtle
 							conn.export(factory.getWriter(out), ctx);
 							out.close();
 							conn.close();
 						} catch (RepositoryException |
 								RDFHandlerException |
 								IOException ex) {
+							// server error
 							try {
 								if (conn != null && conn.isOpen()) {
 									conn.close();
@@ -97,17 +123,21 @@ public class QueryRewriterFactory {
 							} catch (RepositoryException ex1) {
 								ex.addSuppressed(ex1);
 							}
-							if (!(ex instanceof RDFHandlerException &&
-								ex.getCause() instanceof IOException &&
-								ex.getCause().getMessage().equals("Pipe closed"))) {
+							// catch a specific "Pipe closed" error that
+							// is caused by the OWL-API, when the input stream
+							// is closed prematurily
+							if (!(ex instanceof RDFHandlerException
+									&& ex.getCause() instanceof IOException
+									&& ex.getCause().getMessage().equals("Pipe closed"))) {
 								logger.log(
 										Level.WARNING,
 										"Error while exporting ontology",
-										ex);	
+										ex);
 							}
 						}
 					}
 				};
+				// run in a separate thread
 				executor.submit(exporter);
 				return in;
 			}
@@ -141,12 +171,19 @@ public class QueryRewriterFactory {
 
 	}
 
+	/**
+	 * Creates a new query rewriter factory.
+	 *
+	 * @param rep the repository to use
+	 */
 	private QueryRewriterFactory(SailRepository rep) {
 		this.ontologyContext = SPARQLExtensionProps
 				.getProperty("inference.graph");
 		this.rules = new ArrayList<>();
 		this.rep = rep;
 		this.executor = Executors.newCachedThreadPool();
+		// initial initialization of rewriting rules based on graph in
+		// repository
 		try {
 			updateOntology(rep.getConnection());
 		} catch (RepositoryException ex) {
@@ -154,9 +191,15 @@ public class QueryRewriterFactory {
 		}
 	}
 
+	/**
+	 * Updates the set of rules used for query rewriting.
+	 *
+	 * @param conn the connection to use
+	 */
 	public final synchronized void
 			updateOntology(SailRepositoryConnection conn) {
 		try {
+			// reload the graph and if not empty load rules from the graph
 			URI ctx = conn.getValueFactory().createURI(ontologyContext);
 			if (conn.size(ctx) > 0) {
 				rules = Rules.fromOntology(new RepositorySource());
@@ -166,13 +209,25 @@ public class QueryRewriterFactory {
 		}
 	}
 
+	/**
+	 * Returns a query rewriter for a given repository connection.
+	 *
+	 * @param conn the connection to use
+	 * @return a query rewriter that uses the TBox from the repository
+	 */
 	public synchronized QueryRewriter
 			getRewriter(SailRepositoryConnection conn) {
 		return new QueryRewriter(conn, rules);
 	}
 
-	public static synchronized QueryRewriterFactory getInstance(
-			SailRepository rep) {
+	/**
+	 * Returns a new query rewriter factory instance.
+	 *
+	 * @param rep the repository connection to use
+	 * @return query rewriter factory
+	 */
+	public static synchronized QueryRewriterFactory
+			getInstance(SailRepository rep) {
 		QueryRewriterFactory inst;
 		if (!map.containsKey(rep)) {
 			inst = new QueryRewriterFactory(rep);
@@ -182,7 +237,12 @@ public class QueryRewriterFactory {
 		}
 		return inst;
 	}
-	
+
+	/**
+	 * Returns the graph that is used for the TBox.
+	 *
+	 * @return graph as string
+	 */
 	public String getOntologyContext() {
 		return this.ontologyContext;
 	}

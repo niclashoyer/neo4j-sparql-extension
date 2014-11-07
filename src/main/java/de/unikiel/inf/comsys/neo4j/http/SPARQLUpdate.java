@@ -47,9 +47,9 @@ public class SPARQLUpdate extends AbstractSailResource {
 	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#update-operation">
 	 * SPARQL 1.1 Protocol
 	 * </a>
-	 * @param query the "update" query parameter
-	 * @param defgraphs the "using-graph-uri" query parameter
-	 * @param namedgraphs the "using-named-graph-uri" query parameter
+	 * @param query the "update" form encoded parameter
+	 * @param defgraphs the "using-graph-uri" form encoded parameter
+	 * @param namedgraphs the "using-named-graph-uri" form encoded parameter
 	 * @return "204 No Content", if the operation was successful
 	 */
 	@POST
@@ -86,7 +86,7 @@ public class SPARQLUpdate extends AbstractSailResource {
 	 * @param query the update query
 	 * @param defgraphs graph URI list for RDF dataset
 	 * @param namedgraphs named graph URI list for RDF dataset
-	 * @return 
+	 * @return "204 No Content", if the operation was successful
 	 */
 	private Response handleUpdate(
 			String query,

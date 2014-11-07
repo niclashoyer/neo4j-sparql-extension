@@ -4,3 +4,4 @@
 *.swo
 /nbactions.xml
 /test/
+nb-configuration.xml

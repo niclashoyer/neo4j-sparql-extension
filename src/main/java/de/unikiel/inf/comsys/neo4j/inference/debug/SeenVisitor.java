@@ -65,6 +65,7 @@ import org.openrdf.query.algebra.Projection;
 import org.openrdf.query.algebra.ProjectionElem;
 import org.openrdf.query.algebra.ProjectionElemList;
 import org.openrdf.query.algebra.QueryModelNode;
+import org.openrdf.query.algebra.QueryModelVisitor;
 import org.openrdf.query.algebra.QueryRoot;
 import org.openrdf.query.algebra.Reduced;
 import org.openrdf.query.algebra.Regex;
@@ -82,6 +83,13 @@ import org.openrdf.query.algebra.Var;
 import org.openrdf.query.algebra.ZeroLengthPath;
 import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
 
+/**
+ * A {@link QueryModelVisitor} implementation that records all seen nodes
+ * in a map.
+ * 
+ * This is useful to count all or certain nodes in a tree. It is also useful
+ * to test if a specific node is present in the tree.
+ */
 public class SeenVisitor
 		extends QueryModelVisitorBase<RuntimeException> {
 	
