@@ -1,4 +1,3 @@
-
 package de.unikiel.inf.comsys.neo4j.http;
 
 import java.util.List;
@@ -13,29 +12,37 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.RDFParserRegistry;
 
-public abstract class AbstractSailsResource {
-	
+/**
+ * Abstract super class for the implementation of RDF and SPARQL resources.
+ */
+public abstract class AbstractSailResource {
+
 	protected final SailRepository rep;
 	protected final List<Variant> rdfResultVariants;
-	
-	public AbstractSailsResource(SailRepository rep) {
+
+	/**
+	 * Initialize result variants and save reference to repository.
+	 * @param rep reference to repository
+	 */
+	public AbstractSailResource(SailRepository rep) {
 		this.rep = rep;
 		rdfResultVariants = Variant.mediaTypes(
-			MediaType.valueOf(RDFMediaType.RDF_TURTLE),
-			MediaType.valueOf(RDFMediaType.RDF_NTRIPLES),
-			MediaType.valueOf(RDFMediaType.RDF_XML),
-			MediaType.valueOf(RDFMediaType.RDF_JSON)
+				MediaType.valueOf(RDFMediaType.RDF_TURTLE),
+				MediaType.valueOf(RDFMediaType.RDF_NTRIPLES),
+				MediaType.valueOf(RDFMediaType.RDF_XML),
+				MediaType.valueOf(RDFMediaType.RDF_JSON)
 		).add().build();
 	}
-	
+
 	/**
-	 * Returns an instance of {@link org.openrdf.rio.RDFFormat} for a given
-	 * MIME-Type string.
+	 * Returns an instance of {@link org.openrdf.rio.RDFFormat} for a
+	 * given MIME-Type string.
+	 *
 	 * @param mimetype the MIME-Type as string
 	 * @return the corresponding RDF-Format
 	 */
 	protected RDFFormat getRDFFormat(String mimetype) {
-		switch(mimetype) {
+		switch (mimetype) {
 			default:
 			case RDFMediaType.RDF_TURTLE:
 				return RDFFormat.TURTLE;
@@ -47,28 +54,32 @@ public abstract class AbstractSailsResource {
 				return RDFFormat.RDFJSON;
 		}
 	}
-	
+
 	/**
 	 * Returns the corresponding RDF parser for a given RDF format.
+	 *
 	 * @param format the RDF format
 	 * @return RDF parser
 	 */
 	protected RDFParser getRDFParser(RDFFormat format) {
 		return RDFParserRegistry.getInstance().get(format).getParser();
 	}
-	
+
 	/**
 	 * Returns a new connection for the current repository.
+	 *
 	 * @return a new connection
 	 * @throws RepositoryException if there was a problem getting the connection
 	 */
-	protected SailRepositoryConnection getConnection() throws RepositoryException {
+	protected SailRepositoryConnection getConnection()
+			throws RepositoryException {
 		return rep.getConnection();
 	}
-	
+
 	/**
 	 * Closes a repository connection if it is open. Does nothing if it is
 	 * already closed.
+	 *
 	 * @param conn the connection to close
 	 * @throws WebApplicationException if there was a problem while closing the
 	 * connection
@@ -84,11 +95,12 @@ public abstract class AbstractSailsResource {
 			}
 		}
 	}
-	
+
 	/**
 	 * Closes a repository connection it it is open. Does nothing if it is
-	 * closed. If an exception occurs while closing the connection it will
-	 * be added as suppressed exception to the given exception.
+	 * closed. If an exception occurs while closing the connection it will be
+	 * added as suppressed exception to the given exception.
+	 *
 	 * @param conn the connection to close
 	 * @param ex an exception that caused the closing of the connection
 	 */

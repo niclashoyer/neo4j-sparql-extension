@@ -1,4 +1,3 @@
-
 package de.unikiel.inf.comsys.neo4j.http;
 
 import de.unikiel.inf.comsys.neo4j.http.streams.ChunkedCommitHandler;
@@ -37,18 +36,41 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 
-public class GraphStore extends AbstractSailsResource {
+/**
+ * Implementation of the SPARQL 1.1 Graph Store HTTP Protocol.
+ *
+ * @see <a href="http://www.w3.org/TR/sparql11-http-rdf-update/">
+ * SPARQL 1.1 Graph Store HTTP Protocol
+ * </a>
+ */
+public class GraphStore extends AbstractSailResource {
 
 	private final ValueFactory vf;
 	private final long chunksize;
-	
+
+	/**
+	 * Create a new graph store management resource based on a repository.
+	 *
+	 * @param rep the repository this resources operates on
+	 */
 	public GraphStore(SailRepository rep) {
 		super(rep);
 		this.vf = rep.getValueFactory();
 		String chunksizeStr = SPARQLExtensionProps.getProperty("chunksize");
 		chunksize = Long.parseLong(chunksizeStr);
 	}
-	
+
+	/**
+	 * Indirect HTTP GET
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-http-rdf-update/#http-get">
+	 * Section 5.2 "HTTP GET"
+	 * </a>
+	 * @param req JAX-RS {@link Request} object
+	 * @param graphString the "graph" query parameter
+	 * @param def the "default" query parameter
+	 * @return the content of the request graph as HTTP response
+	 */
 	@GET
 	@Produces({
 		RDFMediaType.RDF_TURTLE,
@@ -62,7 +84,21 @@ public class GraphStore extends AbstractSailsResource {
 			@QueryParam("default") String def) {
 		return handleGet(req, def, graphString);
 	}
-	
+
+	/**
+	 * Indirect HTTP PUT
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-http-rdf-update/#http-put">
+	 * Section 5.3 "HTTP PUT"
+	 * </a>
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param type Content-Type HTTP header field
+	 * @param graphString the "graph" query parameter
+	 * @param def the "default" query parameter
+	 * @param chunked the "chunked" query parameter
+	 * @param in HTTP body as {@link InputStream}
+	 * @return "204 No Content", if operation was successful
+	 */
 	@PUT
 	@Consumes({
 		RDFMediaType.RDF_TURTLE,
@@ -79,14 +115,39 @@ public class GraphStore extends AbstractSailsResource {
 			InputStream in) {
 		return handleAdd(uriInfo, type, graphString, def, in, chunked, true);
 	}
-	
+
+	/**
+	 * Indirect HTTP DELETE
+	 *
+	 * @see <a
+	 * href="http://www.w3.org/TR/sparql11-http-rdf-update/#http-delete">
+	 * Section 5.4 "HTTP DELETE"
+	 * </a>
+	 * @param graphString the "graph" query parameter
+	 * @param def the "default" query parameter
+	 * @return "204 No Content", if operation was successful
+	 */
 	@DELETE
 	public Response graphIndirectDelete(
 			@QueryParam("graph") String graphString,
 			@QueryParam("default") String def) {
 		return handleClear(graphString);
 	}
-	
+
+	/**
+	 * Indirect HTTP POST
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-http-rdf-update/#http-post">
+	 * Section 5.5 "HTTP POST"
+	 * </a>
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param type Content-Type HTTP header field
+	 * @param graphString the "graph" query parameter
+	 * @param def the "default" query parameter
+	 * @param chunked the "chunked" query parameter
+	 * @param in HTTP body as {@link InputStream}
+	 * @return "204 No Content", if operation was successful
+	 */
 	@POST
 	@Consumes({
 		RDFMediaType.RDF_TURTLE,
@@ -103,7 +164,18 @@ public class GraphStore extends AbstractSailsResource {
 			InputStream in) {
 		return handleAdd(uriInfo, type, graphString, def, in, chunked, false);
 	}
-	
+
+	/**
+	 * Direct HTTP GET
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-http-rdf-update/#http-get">
+	 * Section 5.2 "HTTP GET"
+	 * </a>
+	 * @param req JAX-RS {@link Request} object
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param graphString the "graph" query parameter
+	 * @return the content of the request graph as HTTP response
+	 */
 	@GET
 	@Produces({
 		RDFMediaType.RDF_TURTLE,
@@ -119,7 +191,19 @@ public class GraphStore extends AbstractSailsResource {
 		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
 		return handleGet(req, null, graphuri);
 	}
-	
+
+	/**
+	 * Direct HTTP PUT
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-http-rdf-update/#http-put">
+	 * Section 5.3 "HTTP PUT"
+	 * </a>
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param type Content-Type HTTP header field
+	 * @param chunked the "chunked" query parameter
+	 * @param in HTTP body as {@link InputStream}
+	 * @return "204 No Content", if operation was successful
+	 */
 	@PUT
 	@Consumes({
 		RDFMediaType.RDF_TURTLE,
@@ -136,14 +220,36 @@ public class GraphStore extends AbstractSailsResource {
 		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
 		return handleAdd(uriInfo, type, graphuri, null, in, chunked, true);
 	}
-	
+
+	/**
+	 * Direct HTTP DELETE
+	 *
+	 * @see <a
+	 * href="http://www.w3.org/TR/sparql11-http-rdf-update/#http-delete">
+	 * Section 5.4 "HTTP DELETE"
+	 * </a>
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @return "204 No Content", if operation was successful
+	 */
 	@DELETE
 	@Path("/{graph}")
 	public Response graphDirectDelete(@Context UriInfo uriInfo) {
 		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
 		return handleClear(graphuri);
 	}
-	
+
+	/**
+	 * Direct HTTP POST
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-http-rdf-update/#http-post">
+	 * Section 5.5 "HTTP POST"
+	 * </a>
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param type Content-Type HTTP header field
+	 * @param chunked the "chunked" query parameter
+	 * @param in HTTP body as {@link InputStream}
+	 * @return "204 No Content", if operation was successful
+	 */
 	@POST
 	@Consumes({
 		RDFMediaType.RDF_TURTLE,
@@ -157,10 +263,22 @@ public class GraphStore extends AbstractSailsResource {
 			@HeaderParam("Content-Type") MediaType type,
 			@QueryParam("chunked") String chunked,
 			InputStream in) {
-			String graphuri = uriInfo.getAbsolutePath().toASCIIString();
+		String graphuri = uriInfo.getAbsolutePath().toASCIIString();
 		return handleAdd(uriInfo, type, graphuri, null, in, chunked, false);
 	}
-	
+
+	/**
+	 * Adds RDF data to a graph in the repository.
+	 *
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param type Content-Type HTTP header field
+	 * @param graphString the "graph" query parameter
+	 * @param def the "default" query parameter
+	 * @param in RDF data
+	 * @param chunkedStr the "chunked" query parameter
+	 * @param clear true if the graph should be cleared before adding data
+	 * @return "204 No Content", if operation was successful
+	 */
 	private Response handleAdd(
 			UriInfo uriInfo,
 			MediaType type,
@@ -178,16 +296,19 @@ public class GraphStore extends AbstractSailsResource {
 		try {
 			boolean chunked = chunkedStr != null && chunkedStr.equals("true");
 			Resource dctx = null;
+			// get the base URI by using direct or indirect graph reference
 			String base = uriInfo.getAbsolutePath().toASCIIString();
 			if (graphString != null) {
 				dctx = vf.createURI(graphString);
 				base = dctx.stringValue();
 			}
+			// check if a Content-Type header was set
 			if (type == null) {
 				return Response.status(Response.Status.BAD_REQUEST).build();
 			}
 			String typestr = type.getType() + "/" + type.getSubtype();
 			RDFFormat format = getRDFFormat(typestr);
+			// begin import
 			conn.begin();
 			if (dctx != null) {
 				if (clear) {
@@ -201,6 +322,8 @@ public class GraphStore extends AbstractSailsResource {
 				addToGraphstore(conn, in, base, format, null, chunked);
 			}
 			conn.commit();
+			// check for modifications of TBox-graph and notify the query
+			// rewriting component
 			if (dctx != null) {
 				QueryRewriterFactory qr = QueryRewriterFactory.getInstance(rep);
 				if (dctx.stringValue().equals(qr.getOntologyContext())) {
@@ -210,16 +333,21 @@ public class GraphStore extends AbstractSailsResource {
 			close(conn);
 			return Response.noContent().build();
 		} catch (RDFParseException ex) {
+			// rdf syntax error
 			String str = ex.getMessage();
 			close(conn, ex);
 			return Response.status(400).entity(
 					str.getBytes(Charset.forName("UTF-8"))).build();
-		} catch(IOException | RepositoryException | RDFHandlerException ex) {
+		} catch (IOException | RepositoryException | RDFHandlerException ex) {
+			// server error
 			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}
 	}
-	
+
+	/**
+	 * Helper method for handleAdd.
+	 */
 	private void addToGraphstore(
 			RepositoryConnection conn,
 			InputStream in,
@@ -231,7 +359,7 @@ public class GraphStore extends AbstractSailsResource {
 		if (chunked) {
 			RDFParser parser = getRDFParser(format);
 			parser.setRDFHandler(
-				new ChunkedCommitHandler(conn, chunksize, dctx));
+					new ChunkedCommitHandler(conn, chunksize, dctx));
 			parser.parse(in, base);
 		} else {
 			if (dctx != null) {
@@ -241,7 +369,13 @@ public class GraphStore extends AbstractSailsResource {
 			}
 		}
 	}
-	
+
+	/**
+	 * Deletes all data from a graph in the repository.
+	 *
+	 * @param graphString the graph to delete
+	 * @return "204 No Content", if operation was successful
+	 */
 	private Response handleClear(String graphString) {
 		SailRepositoryConnection conn;
 		try {
@@ -254,6 +388,8 @@ public class GraphStore extends AbstractSailsResource {
 			if (graphString != null) {
 				Resource ctx = vf.createURI(graphString);
 				conn.clear(ctx);
+				// check if TBox graph has been cleared and notify query
+				// rewriting component
 				QueryRewriterFactory qr = QueryRewriterFactory.getInstance(rep);
 				if (ctx.stringValue().equals(qr.getOntologyContext())) {
 					qr.updateOntology(conn);
@@ -264,16 +400,27 @@ public class GraphStore extends AbstractSailsResource {
 			conn.commit();
 			close(conn);
 		} catch (RepositoryException ex) {
+			// server error
 			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}
 		return Response.noContent().build();
 	}
-	
+
+	/**
+	 * Returns RDF data from a graph in the repository.
+	 *
+	 * @see RDFStreamingOutput
+	 * @param req JAX-RS {@link Request} object
+	 * @param def the "default" query parameter
+	 * @param graphString the "graph" query parameter
+	 * @return RDF data as HTTP response
+	 */
 	private Response handleGet(
 			Request req,
 			String def,
 			String graphString) {
+		// select matching MIME-Type for response based on HTTP headers
 		final Variant variant = req.selectVariant(rdfResultVariants);
 		final MediaType mt = variant.getMediaType();
 		final String mtstr = mt.getType() + "/" + mt.getSubtype();
@@ -281,6 +428,7 @@ public class GraphStore extends AbstractSailsResource {
 		StreamingOutput stream;
 		RepositoryConnection conn = null;
 		try {
+			// return data as RDF stream
 			conn = getConnection();
 			if (graphString != null) {
 				Resource ctx = vf.createURI(graphString);
@@ -292,10 +440,11 @@ public class GraphStore extends AbstractSailsResource {
 				stream = new RDFStreamingOutput(conn, format);
 			}
 		} catch (RepositoryException ex) {
+			// server error
 			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}
 		return Response.ok(stream).build();
 	}
-	
+
 }

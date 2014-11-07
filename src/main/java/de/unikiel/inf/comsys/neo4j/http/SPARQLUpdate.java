@@ -1,4 +1,3 @@
-
 package de.unikiel.inf.comsys.neo4j.http;
 
 import java.nio.charset.Charset;
@@ -20,15 +19,39 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 
-public class SPARQLUpdate extends AbstractSailsResource {
-	
-	private static final Logger logger =
-		Logger.getLogger(SPARQLUpdate.class.getName());
-	
+/**
+ * Implementation of the "update operation" part of the SPARQL 1.1 Protocol
+ * standard.
+ *
+ * @see <a href="http://www.w3.org/TR/sparql11-protocol/#update-operation">
+ * SPARQL 1.1 Protocol
+ * </a>
+ */
+public class SPARQLUpdate extends AbstractSailResource {
+
+	private static final Logger logger
+			= Logger.getLogger(SPARQLUpdate.class.getName());
+
+	/**
+	 * Create a new SPARQL 1.1 update resource based on a repository.
+	 *
+	 * @param rep the repository this resources operates on
+	 */
 	public SPARQLUpdate(SailRepository rep) {
 		super(rep);
 	}
-	
+
+	/**
+	 * Update via URL-encoded POST.
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#update-operation">
+	 * SPARQL 1.1 Protocol
+	 * </a>
+	 * @param query the "update" query parameter
+	 * @param defgraphs the "using-graph-uri" query parameter
+	 * @param namedgraphs the "using-named-graph-uri" query parameter
+	 * @return "204 No Content", if the operation was successful
+	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response updatePOSTEncoded(
@@ -38,6 +61,17 @@ public class SPARQLUpdate extends AbstractSailsResource {
 		return handleUpdate(query, defgraphs, namedgraphs);
 	}
 
+	/**
+	 * Update via POST directly.
+	 * 
+	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#update-operation">
+	 * SPARQL 1.1 Protocol
+	 * </a>
+	 * @param defgraphs the "using-graph-uri" query parameter
+	 * @param namedgraphs the "using-named-graph-uri" query parameter
+	 * @param query query as string
+	 * @return "204 No Content", if the operation was successful
+	 */
 	@POST
 	@Consumes(RDFMediaType.SPARQL_UPDATE)
 	public Response updatePOSTDirect(
@@ -46,7 +80,14 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			String query) {
 		return handleUpdate(query, defgraphs, namedgraphs);
 	}
-	
+
+	/**
+	 * Executes a SPARQL 1.1 update operation on a graph in the repository.
+	 * @param query the update query
+	 * @param defgraphs graph URI list for RDF dataset
+	 * @param namedgraphs named graph URI list for RDF dataset
+	 * @return 
+	 */
 	private Response handleUpdate(
 			String query,
 			List<String> defgraphs,
@@ -58,9 +99,11 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			throw new WebApplicationException(ex);
 		}
 		try {
+			// check if query is empty
 			if (query == null || query.length() == 0) {
 				throw new MalformedQueryException("empty query");
 			}
+			// execute update query
 			Update update = conn.prepareUpdate(QueryLanguage.SPARQL, query);
 			logger.log(Level.FINER, "[BEGIN] Update transaction begin");
 			conn.begin();
@@ -71,11 +114,13 @@ public class SPARQLUpdate extends AbstractSailsResource {
 			close(conn);
 			return Response.ok().build();
 		} catch (MalformedQueryException ex) {
+			// syntax error
 			String str = ex.getMessage();
 			close(conn, ex);
 			return Response.status(Response.Status.BAD_REQUEST).entity(
 					str.getBytes(Charset.forName("UTF-8"))).build();
 		} catch (RepositoryException | UpdateExecutionException ex) {
+			// server error
 			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}

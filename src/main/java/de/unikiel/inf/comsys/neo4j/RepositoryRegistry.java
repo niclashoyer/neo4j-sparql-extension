@@ -20,14 +20,29 @@ import org.openrdf.rio.turtle.TurtleParserFactory;
 import org.openrdf.rio.turtle.TurtleWriterFactory;
 import org.openrdf.sail.Sail;
 
+/**
+ * Sesame repository instance management.
+ * 
+ * This registry ensures that for each
+ * {@link GraphDatabaseService} object there is only one
+ * {@link Neo4j2Graph}, {@link GraphSail} and {@link SailRepository} instance.
+ */
 public class RepositoryRegistry {
-	
+
 	private static final WeakHashMap<GraphDatabaseService, RepositoryRegistry>
-		map = new WeakHashMap<>();
+			map = new WeakHashMap<>();
 	private static boolean rioInitialized = false;
 	private final SailRepository rep;
- 
-    private RepositoryRegistry(GraphDatabaseService database)
+
+	/**
+	 * Initializes Sesame repository for Neo4j based on Blueprints
+	 * implementation.
+	 *
+	 * @param database Neo4j database service
+	 * @throws RepositoryException if there was a problem initializing the
+	 * Sesame repository
+	 */
+	private RepositoryRegistry(GraphDatabaseService database)
 			throws RepositoryException {
 		initRio();
 		Graph graph = new Neo4j2Graph(database);
@@ -36,29 +51,44 @@ public class RepositoryRegistry {
 		this.rep = new SailRepository(sail);
 		rep.initialize();
 	}
- 
-    public static RepositoryRegistry getInstance(
-		GraphDatabaseService database) throws RepositoryException {
+
+	/**
+	 * Returns a new registry for a Neo4j database service. This class uses a
+	 * singleton pattern and thus at most one registry is created per database
+	 * service.
+	 *
+	 * @param database
+	 * @return a repository registry
+	 * @throws RepositoryException if there was a problem while initializing the
+	 * repository
+	 */
+	public static RepositoryRegistry getInstance(
+			GraphDatabaseService database) throws RepositoryException {
 		RepositoryRegistry inst;
-        if (!map.containsKey(database)) {
-			synchronized(RepositoryRegistry.class) {
+		if (!map.containsKey(database)) {
+			synchronized (RepositoryRegistry.class) {
 				if (!map.containsKey(database)) {
 					inst = new RepositoryRegistry(database);
 					map.put(database, inst);
 				}
 			}
-        }
-        return map.get(database);
-    }
-	
+		}
+		return map.get(database);
+	}
+
+	/**
+	 * Returns the repository associated with this registry.
+	 *
+	 * @return the repository
+	 */
 	public SailRepository getRepository() {
 		return rep;
 	}
-	
+
 	/**
-	 * This is needed, because Rio is unable to find the Parser/Writer
-	 * Factories automatically when the jar gets deployed as plugin
-	 * inside the Neo4j Server.
+	 * This is needed, because Rio is unable to find the Parser/Writer Factories
+	 * automatically when the jar gets deployed as plugin inside the Neo4j
+	 * Server.
 	 */
 	private synchronized void initRio() {
 		if (!rioInitialized) {

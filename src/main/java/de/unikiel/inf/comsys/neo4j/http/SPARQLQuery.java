@@ -44,7 +44,15 @@ import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFWriterFactory;
 import org.openrdf.rio.RDFWriterRegistry;
 
-public class SPARQLQuery extends AbstractSailsResource {
+/**
+ * Implementation of the "query operation" part of the SPARQL 1.1 Protocol
+ * standard.
+ *
+ * @see <a href="http://www.w3.org/TR/sparql11-protocol/#query-operation">
+ * SPARQL 1.1 Protocol
+ * </a>
+ */
+public class SPARQLQuery extends AbstractSailResource {
 
 	private final List<Variant> queryResultVariants;
 	private final List<Variant> booleanResultVariants;
