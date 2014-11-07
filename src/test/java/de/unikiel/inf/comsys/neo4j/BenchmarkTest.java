@@ -50,6 +50,14 @@ public class BenchmarkTest extends RDFServerExtensionTest {
 	@Test
 	public void queryi2() throws IOException { runquery("q2", true); }
 	@Test
+	public void query3() throws IOException { runquery("q3", false); }
+	@Test
+	public void queryi3() throws IOException { runquery("q3", true); }
+	@Test
+	public void query4() throws IOException { runquery("q4", false); }
+	@Test
+	public void queryi4() throws IOException { runquery("q4", true); }
+	@Test
 	public void query10() throws IOException { runquery("q10", false); }
 	@Test
 	public void queryi10() throws IOException { runquery("q10", true); }

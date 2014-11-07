@@ -97,7 +97,7 @@ public class InferenceBenchmarkTest {
 		String query;
 		InputStream result;
 		String comment;
-		ArrayList<Object[]> tests = new ArrayList<>();;
+		ArrayList<Object[]> tests = new ArrayList<>();
 		while(r.hasNext()) {
 			b = r.next();
 			String datastr   = b.getValue("data").stringValue();
