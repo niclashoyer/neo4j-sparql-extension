@@ -1,7 +1,7 @@
 /**
- * Implementation of rules for transformation of statement patterns.
+ * Implementations of extractors that extract rules from an OWL-2 ontology.
  */
-package de.unikiel.inf.comsys.neo4j.inference.rules;
+package de.unikiel.inf.comsys.neo4j.inference.rules.extractor;
 
 /*
  * #%L

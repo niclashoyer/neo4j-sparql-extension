@@ -36,6 +36,7 @@
 				<exclude>org.eclipse.jetty.orbit:*</exclude>
 				<exclude>com.sun.jersey:*</exclude>
 				<exclude>org.neo4j.3rdparty.javax.ws.rs:*</exclude>
+				<exclude>org.mozilla:*</exclude>
 			</excludes>
 		</dependencySet>
 	</dependencySets>
