@@ -252,6 +252,22 @@
 				<version>1.7</version>
 				<executions>
 					<execution>
+						<id>first</id>
+						<goals>
+							<goal>update-file-header</goal>
+						</goals>
+						<phase>process-sources</phase>
+						<configuration>
+							<organizationName>Niclas Hoyer</organizationName>
+							<inceptionYear>2014</inceptionYear>
+							<licenseName>gpl_v3</licenseName>
+							<roots>
+								<root>src/main/java</root>
+								<root>src/test</root>
+							</roots>
+						</configuration>
+					</execution>
+					<execution>
 						<id>default-cli</id>
 						<configuration>
 							<licenseMerges>
