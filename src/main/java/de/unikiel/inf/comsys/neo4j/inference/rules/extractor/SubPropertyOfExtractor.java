@@ -13,6 +13,10 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubDataPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 
+/**
+ * {@link Extractor} implementation that extracts
+ * {@link SubPropertyOf} rules.
+ */
 public class SubPropertyOfExtractor extends AbstractExtractor {
 
 	private void addAxiom(List<Rule> list, OWLSubDataPropertyOfAxiom a) {
@@ -44,11 +48,20 @@ public class SubPropertyOfExtractor extends AbstractExtractor {
 		}
 	}
 	
+	/**
+     * Extracts {@link SubPropertyOf} rules.
+	 * 
+	 * @param ot ontology
+	 * @return extracted rules
+	 */
 	@Override
 	public List<Rule> extract(OWLOntology ot) {
 		ArrayList<Rule> list = new ArrayList<>();
+		// direct mapping of SubObjectPropertyOf axioms
 		addObjectAxioms(list, ot.getAxioms(AxiomType.SUB_OBJECT_PROPERTY));
+		// direct mapping of SubDataPropertyOf axioms
 		addDataAxioms(list, ot.getAxioms(AxiomType.SUB_DATA_PROPERTY));
+		// indirect mapping of shortcut axioms
 		for (OWLEquivalentObjectPropertiesAxiom a :
 				ot.getAxioms(AxiomType.EQUIVALENT_OBJECT_PROPERTIES)) {
 			addObjectAxioms(list, a.asSubObjectPropertyOfAxioms());

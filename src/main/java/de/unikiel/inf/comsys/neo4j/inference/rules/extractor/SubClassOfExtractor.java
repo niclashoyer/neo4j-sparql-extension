@@ -13,6 +13,10 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiomSetShortCut;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiomShortCut;
 
+/**
+ * {@link Extractor} implementation that extracts
+ * {@link SubClassOf} rules.
+ */
 public class SubClassOfExtractor extends AbstractExtractor {
 	
 	private void addAxiom(List<Rule> list, OWLSubClassOfAxiom a) {
@@ -30,10 +34,18 @@ public class SubClassOfExtractor extends AbstractExtractor {
 		}
 	}
 	
+	/**
+	 * Extracts {@link SubClassOf} rules.
+	 * 
+	 * @param ot ontology
+	 * @return extracted rules
+	 */
 	@Override
 	public List<Rule> extract(OWLOntology ot) {
 		ArrayList<Rule> list = new ArrayList<>();
+		// direct mapping of SubClassOf axioms
 		addAxioms(list, ot.getAxioms(AxiomType.SUBCLASS_OF));
+		// indirect mapping of shortcut axioms
 		for (OWLAxiom a : ot.getAxioms()) {
 			if (a instanceof OWLSubClassOfAxiomSetShortCut) {
 				OWLSubClassOfAxiomSetShortCut sc =

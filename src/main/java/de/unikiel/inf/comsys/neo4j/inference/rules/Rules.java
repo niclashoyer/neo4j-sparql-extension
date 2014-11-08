@@ -1,7 +1,6 @@
 
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
-import de.unikiel.inf.comsys.neo4j.inference.rules.Rule;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.Extractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.InverseObjectPropertiesExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.ObjectPropertyChainExtractor;
