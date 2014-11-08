@@ -1,6 +1,7 @@
 package de.unikiel.inf.comsys.neo4j.inference;
 
 import de.unikiel.inf.comsys.neo4j.inference.rules.Rule;
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rules;
 import de.unikiel.inf.comsys.neo4j.inference.sail.SailTupleExprQuery;
 import de.unikiel.inf.comsys.neo4j.inference.sail.SailBooleanExprQuery;
 import de.unikiel.inf.comsys.neo4j.inference.sail.SailGraphExprQuery;
