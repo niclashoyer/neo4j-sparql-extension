@@ -1,14 +1,12 @@
 
 package de.unikiel.inf.comsys.neo4j.inference;
 
-import com.google.common.collect.Lists;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.Extractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.InverseObjectPropertiesExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.ObjectPropertyChainExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.PredicateVariableExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.SubClassOfExtractor;
 import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.SubPropertyOfExtractor;
-import de.unikiel.inf.comsys.neo4j.inference.rules.extractor.SymmetricPropertyExtractor;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,7 +89,6 @@ public class Rules {
 		extractors.add(new PredicateVariableExtractor());
 		extractors.add(new SubClassOfExtractor());
 		extractors.add(new SubPropertyOfExtractor());
-		extractors.add(new SymmetricPropertyExtractor());
 		// call each extractor and accumulate rules
 		for (Extractor extr : extractors) {
 			list.addAll(extr.extract(ot));

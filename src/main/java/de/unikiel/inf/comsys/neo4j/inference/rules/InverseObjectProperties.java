@@ -49,9 +49,9 @@ public class InverseObjectProperties extends AbstractRule {
 	/**
 	 * Transform a statement pattern according to OWL-2 inverse properties
 	 * axiom.
-	 * 
-	 * @param node 
-	 * @return 
+	 *
+	 * @param node the node to transform
+	 * @return list of nodes to visit next
 	 */
 	@Override
 	public List<QueryModelNode> apply(StatementPattern node) {

@@ -15,37 +15,70 @@ import org.openrdf.query.algebra.Union;
 import org.openrdf.query.algebra.ValueConstant;
 import org.openrdf.query.algebra.Var;
 
+/**
+ * A rule that transforms a statement pattern that contains a variable as
+ * predicate to include inferred triples.
+ */
 public class PredicateVariable extends AbstractRule {
 	
 	private final List<String> predicates;
 	
+	/**
+	 * Create a new predicate variable rule.
+	 * 
+	 * @param predicates all possible predicates of the TBox
+	 */
 	public PredicateVariable(String... predicates) {
 		this(Arrays.asList(predicates));
 	}
-	
+
+	/**
+	 * Create a new predicate variable rule.
+	 * 
+	 * @param predicates all possible predicates of the TBox
+	 */
 	public PredicateVariable(List<String> predicates) {
 		this.predicates = predicates;
 	}
 	
+	/**
+	 * Returns true if this rule is applicable to a node.
+	 *
+	 * @param node to a node
+	 * @return true if the rule is applicable, false otherwise
+	 */
 	@Override
 	public boolean canApply(StatementPattern node) {
 		Var p = node.getPredicateVar();
-		return !(predicates.isEmpty() || p.isConstant()); // TODO: check if check for variable is correct
+		// check if predicate is variable
+		return !(predicates.isEmpty() || p.isConstant());
 	}
 
+	/**
+	 * Returns a list of expressions as a chain of {@link Union} objects, that
+	 * will unify all expressions.
+	 * 
+	 * @param unions the expressions to unify
+	 * @return an expression that unifies all given expressions
+	 */
 	private TupleExpr listAsUnion(List<TupleExpr> unions) {
+		// nothing to unify
 		if (unions.isEmpty()) {
 			return new EmptySet();
 		}
+		// no need to add a union
 		if (unions.size() == 1) {
 			return unions.get(0);
 		}
 		Union last;
 		Union tmp;
+		// start with a union of two elements
 		Union first = new Union();
 		first.setLeftArg(unions.get(0));
 		first.setRightArg(unions.get(1));
 		last = first;
+		// for each additional element replace the right side with another
+		// union
 		for (int i = 2; i < unions.size(); i++) {
 			tmp = new Union(
 				last.getRightArg(),
@@ -57,6 +90,16 @@ public class PredicateVariable extends AbstractRule {
 		return first;
 	}
 	
+	/**
+	 * Creates an expression that extends a statement pattern to include
+	 * inferred predicates.
+	 * 
+	 * @param assign a list of predicates that could be inferred
+	 * @param source the source statement pattern
+	 * @param next a list of expressions that should be visited next
+	 * @return a union of statement patterns that include inferred triples
+	 * for a predicate variable
+	 */
 	private TupleExpr assignPredicates(
 			List<String> assign, StatementPattern source,
 			List<QueryModelNode> next) {
@@ -70,6 +113,8 @@ public class PredicateVariable extends AbstractRule {
 		Var p2;
 		StatementPattern sp;
 		ArrayList<TupleExpr> union = new ArrayList<>();
+		// for each possible predicate create an extension element that will
+		// bind the predicate to the variable, if the predicate can be inferred.
 		for (String a : assign) {
 			p2 = new ConstVar(vf.createURI(a));
 			sp = new StatementPattern(s, p2, o, c);
@@ -83,6 +128,12 @@ public class PredicateVariable extends AbstractRule {
 		return listAsUnion(union);
 	}
 	
+	/**
+	 * Transform a statement pattern to infer triples for a predicate variable.
+	 * 
+	 * @param node the node to transform
+	 * @return list of nodes to visit next
+	 */
 	@Override
 	public List<QueryModelNode> apply(StatementPattern node) {
 		List<QueryModelNode> next = newNextList();
