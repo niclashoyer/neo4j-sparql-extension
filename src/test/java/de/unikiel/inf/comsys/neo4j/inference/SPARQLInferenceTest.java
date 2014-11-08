@@ -1,5 +1,7 @@
 package de.unikiel.inf.comsys.neo4j.inference;
 
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rules;
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rule;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import java.io.IOException;

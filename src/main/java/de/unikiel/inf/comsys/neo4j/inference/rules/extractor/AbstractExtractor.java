@@ -1,4 +1,3 @@
-
 package de.unikiel.inf.comsys.neo4j.inference.rules.extractor;
 
 import java.util.ArrayList;
@@ -8,20 +7,48 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
+/**
+ * An abstract superclass for extractors that contains utility methods for data
+ * handling with the OWL-API.
+ */
 public abstract class AbstractExtractor implements Extractor {
-	
+
+	/**
+	 * Returns the URI of a OWL class.
+	 *
+	 * @param clazz the OWL class
+	 * @return URI
+	 */
 	protected static String getString(OWLClassExpression clazz) {
 		return ((OWLClass) clazz).getIRI().toURI().toASCIIString();
 	}
-	
+
+	/**
+	 * Returns the URI of an object property.
+	 *
+	 * @param property the object property
+	 * @return URI
+	 */
 	protected static String getString(OWLObjectPropertyExpression property) {
 		return property.getNamedProperty().getIRI().toURI().toASCIIString();
 	}
-	
+
+	/**
+	 * Returns the URI of a data property.
+	 *
+	 * @param property the data property
+	 * @return URI
+	 */
 	protected static String getString(OWLDataPropertyExpression property) {
 		return property.asOWLDataProperty().getIRI().toURI().toASCIIString();
 	}
-	
+
+	/**
+	 * Returns the URIs of a list of object properties.
+	 * 
+	 * @param properties object properties
+	 * @return list of URIs
+	 */
 	protected static List<String> getStrings(List<OWLObjectPropertyExpression> properties) {
 		List<String> strs = new ArrayList<>();
 		for (OWLObjectPropertyExpression op : properties) {
@@ -29,5 +56,5 @@ public abstract class AbstractExtractor implements Extractor {
 		}
 		return strs;
 	}
-	
+
 }
