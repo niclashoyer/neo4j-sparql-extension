@@ -8,7 +8,7 @@ import org.openrdf.repository.sail.SailGraphQuery;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 
 /**
- * A subclass of {@link SailGraphExprQuery} with a public constructor to
+ * A subclass of {@link SailGraphQuery} with a public constructor to
  * pass in a graph query containing a tuple expression.
  * 
  * The original constructor of {@link SailGraphExprQuery} is protected, thus
