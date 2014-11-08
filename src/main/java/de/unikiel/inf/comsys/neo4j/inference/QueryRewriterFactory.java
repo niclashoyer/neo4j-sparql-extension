@@ -1,5 +1,7 @@
 package de.unikiel.inf.comsys.neo4j.inference;
 
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rules;
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rule;
 import de.unikiel.inf.comsys.neo4j.SPARQLExtensionProps;
 import de.unikiel.inf.comsys.neo4j.http.RDFMediaType;
 import de.unikiel.inf.comsys.neo4j.http.SPARQLUpdate;

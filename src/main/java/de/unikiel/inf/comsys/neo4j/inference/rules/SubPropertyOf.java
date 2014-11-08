@@ -1,4 +1,3 @@
-
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
 import java.util.List;
@@ -7,8 +6,8 @@ import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.Union;
 
 /**
- * A rule that transforms a statement pattern according to the
- * SubPropertyOf OWL-2 Axiom.
+ * A rule that transforms a statement pattern according to the SubPropertyOf
+ * OWL-2 Axiom.
  *
  * @see
  * <a href="http://www.w3.org/TR/owl2-semantics/#Object_Property_Expression_Axioms">
@@ -16,13 +15,13 @@ import org.openrdf.query.algebra.Union;
  * </a>
  */
 public class SubPropertyOf extends AbstractRule {
-	
+
 	private final String op1;
 	private final String op2;
-	
+
 	/**
 	 * Create a new subproperty rule.
-	 * 
+	 *
 	 * @param op1 the subproperty
 	 * @param op2 the superproperty
 	 */
@@ -30,7 +29,7 @@ public class SubPropertyOf extends AbstractRule {
 		this.op1 = op1;
 		this.op2 = op2;
 	}
-	
+
 	/**
 	 * Returns true if this rule is applicable to a node.
 	 *
@@ -53,24 +52,24 @@ public class SubPropertyOf extends AbstractRule {
 	@Override
 	public List<QueryModelNode> apply(StatementPattern node) {
 		List<QueryModelNode> next = newNextList();
-		StatementPattern left  = node.clone();
+		StatementPattern left = node.clone();
 		// replace the predicate with the subproperty
-		StatementPattern right =
-			new StatementPattern(
-				node.getSubjectVar(),
-				new ConstVar(vf.createURI(op1)),
-				node.getObjectVar(),
-				node.getContextVar());
+		StatementPattern right
+				= new StatementPattern(
+						node.getSubjectVar(),
+						new ConstVar(vf.createURI(op1)),
+						node.getObjectVar(),
+						node.getContextVar());
 		node.replaceWith(
-			new Union(left, right));
+				new Union(left, right));
 		next.add(left);
 		next.add(right);
 		return next;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "SubPropertyOf(<" + op1 + "> <" + op2 + ">)";
 	}
-	
+
 }

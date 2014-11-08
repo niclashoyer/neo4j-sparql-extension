@@ -1,6 +1,5 @@
 package de.unikiel.inf.comsys.neo4j.inference.rules;
 
-import de.unikiel.inf.comsys.neo4j.inference.Rule;
 import java.util.LinkedList;
 import java.util.List;
 import org.openrdf.model.URI;
@@ -86,8 +85,9 @@ public abstract class AbstractRule implements Rule {
 	}
 
 	/**
-	 * Creates a new list that can be used as a reference to nodes that
-	 * need to be visited after rule application.
+	 * Creates a new list that can be used as a reference to nodes that need to
+	 * be visited after rule application.
+	 *
 	 * @return new query model node list
 	 */
 	protected List<QueryModelNode> newNextList() {

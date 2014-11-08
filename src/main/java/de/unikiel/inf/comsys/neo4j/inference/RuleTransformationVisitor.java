@@ -1,6 +1,7 @@
 
 package de.unikiel.inf.comsys.neo4j.inference;
 
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rule;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;

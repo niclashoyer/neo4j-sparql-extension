@@ -1,4 +1,4 @@
-package de.unikiel.inf.comsys.neo4j.inference;
+package de.unikiel.inf.comsys.neo4j.inference.rules;
 
 import java.util.List;
 import org.openrdf.model.ValueFactory;

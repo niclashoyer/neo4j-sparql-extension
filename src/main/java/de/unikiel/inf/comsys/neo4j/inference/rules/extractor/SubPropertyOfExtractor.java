@@ -1,7 +1,7 @@
 
 package de.unikiel.inf.comsys.neo4j.inference.rules.extractor;
 
-import de.unikiel.inf.comsys.neo4j.inference.Rule;
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rule;
 import de.unikiel.inf.comsys.neo4j.inference.rules.SubPropertyOf;
 import java.util.ArrayList;
 import java.util.List;
