@@ -1,4 +1,14 @@
-package de.unikiel.inf.comsys.neo4j.inference.rules.extractor;
+/**
+ * Neo4j unmanaged extension for RDF storage and SPARQL 1.1 query
+ * features.
+ * 
+ * @see <a href="https://github.com/niclashoyer/neo4j-sparql-extension">
+ * GitHub Page</a>
+ * @see <a href="http://neo4j.com/">Neo4j</a>
+ * @see <a href="http://www.w3.org/TR/rdf-primer/">RDF</a>
+ * @see <a href="http://www.w3.org/TR/sparql11-overview/">SPARQL</a>
+ */
+package de.unikiel.inf.comsys.neo4j;
 
 /*
  * #%L
@@ -21,24 +31,3 @@ package de.unikiel.inf.comsys.neo4j.inference.rules.extractor;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
-import de.unikiel.inf.comsys.neo4j.inference.rules.Rule;
-import java.util.List;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-/**
- * An extractor extracts rules from an OWL-2 ontology.
- *
- * Each extractor should extract a specific rule from an ontology.
- */
-public interface Extractor {
-
-	/**
-	 * Extract rules from an ontology.
-	 *
-	 * @param ot the ontology to extact from
-	 * @return list of rules
-	 */
-	public List<Rule> extract(OWLOntology ot);
-
-}

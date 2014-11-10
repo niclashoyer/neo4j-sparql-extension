@@ -1,5 +1,27 @@
 package de.unikiel.inf.comsys.neo4j.http;
 
+/*
+ * #%L
+ * neo4j-sparql-extension
+ * %%
+ * Copyright (C) 2014 Niclas Hoyer
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import de.unikiel.inf.comsys.neo4j.SPARQLExtensionProps;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLBooleanStreamingOutput;
 import de.unikiel.inf.comsys.neo4j.http.streams.SPARQLGraphStreamingOutput;
@@ -44,15 +66,29 @@ import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.RDFWriterFactory;
 import org.openrdf.rio.RDFWriterRegistry;
 
-public class SPARQLQuery extends AbstractSailsResource {
+/**
+ * Implementation of the "query operation" part of the SPARQL 1.1 Protocol
+ * standard.
+ *
+ * @see <a href="http://www.w3.org/TR/sparql11-protocol/#query-operation">
+ * SPARQL 1.1 Protocol
+ * </a>
+ */
+public class SPARQLQuery extends AbstractSailResource {
 
 	private final List<Variant> queryResultVariants;
 	private final List<Variant> booleanResultVariants;
 	private final QueryRewriterFactory qwfactory;
 	private final int timeout;
 
+	/**
+	 * Create a new SPARQL 1.1 query resource based on a repository.
+	 *
+	 * @param rep the repository this resources operates on
+	 */
 	public SPARQLQuery(SailRepository rep) {
 		super(rep);
+		// initialize additional result MIME-Types
 		queryResultVariants = Variant.mediaTypes(
 				MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_JSON),
 				MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_XML),
@@ -64,11 +100,27 @@ public class SPARQLQuery extends AbstractSailsResource {
 				MediaType.valueOf(RDFMediaType.SPARQL_RESULTS_XML),
 				MediaType.valueOf(MediaType.TEXT_PLAIN)
 		).add().build();
+		// get reference to query rewriting component
 		this.qwfactory = QueryRewriterFactory.getInstance(rep);
+		// get query timeout from properties
 		String sout = SPARQLExtensionProps.getProperty("query.timeout");
 		this.timeout = Integer.parseInt(sout);
 	}
 
+	/**
+	 * Query via GET.
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#query-operation">
+	 * SPARQL 1.1 Protocol
+	 * </a>
+	 * @param req JAX-RS {@link Request} object
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param queryString the "query" query parameter
+	 * @param defgraphs the "default-graph-uri" query parameter
+	 * @param namedgraphs the "named-graph-uri" query parameter
+	 * @param inference the "inference" query parameter
+	 * @return the result of the SPARQL query
+	 */
 	@GET
 	@Produces({
 		RDFMediaType.SPARQL_RESULTS_JSON,
@@ -91,6 +143,20 @@ public class SPARQLQuery extends AbstractSailsResource {
 				req, uriInfo, queryString, defgraphs, namedgraphs, inference);
 	}
 
+	/**
+	 * Query via URL-encoded POST.
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#query-operation">
+	 * SPARQL 1.1 Protocol
+	 * </a>
+	 * @param req JAX-RS {@link Request} object
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param queryString the "query" form encoded parameter
+	 * @param defgraphs the "default-graph-uri" form encoded parameter
+	 * @param namedgraphs the "named-graph-uri" form encoded parameter
+	 * @param inference the "inference" form encoded parameter
+	 * @return the result of the SPARQL query
+	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response queryPOSTEncoded(
@@ -104,6 +170,20 @@ public class SPARQLQuery extends AbstractSailsResource {
 				req, uriInfo, queryString, defgraphs, namedgraphs, inference);
 	}
 
+	/**
+	 * Query via POST directly.
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#query-operation">
+	 * SPARQL 1.1 Protocol
+	 * </a>
+	 * @param req JAX-RS {@link Request} object
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param defgraphs the "default-graph-uri" form encoded parameter
+	 * @param namedgraphs the "named-graph-uri" form encoded parameter
+	 * @param inference the "inference" form encoded parameter
+	 * @param queryString query as string (from HTTP request body)
+	 * @return the result of the SPARQL query
+	 */
 	@POST
 	@Consumes(RDFMediaType.SPARQL_QUERY)
 	public Response queryPOSTDirect(
@@ -117,6 +197,19 @@ public class SPARQLQuery extends AbstractSailsResource {
 				req, uriInfo, queryString, defgraphs, namedgraphs, inference);
 	}
 
+	/**
+	 * Query via GET (with inference).
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#query-operation">
+	 * SPARQL 1.1 Protocol
+	 * </a>
+	 * @param req JAX-RS {@link Request} object
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param queryString the "query" query parameter
+	 * @param defgraphs the "default-graph-uri" query parameter
+	 * @param namedgraphs the "named-graph-uri" query parameter
+	 * @return the result of the SPARQL query
+	 */
 	@GET
 	@Path("/inference")
 	@Produces({
@@ -139,6 +232,19 @@ public class SPARQLQuery extends AbstractSailsResource {
 				req, uriInfo, queryString, defgraphs, namedgraphs, "true");
 	}
 
+	/**
+	 * Query via URL-encoded POST (with inference).
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#query-operation">
+	 * SPARQL 1.1 Protocol
+	 * </a>
+	 * @param req JAX-RS {@link Request} object
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param queryString the "query" form encoded parameter
+	 * @param defgraphs the "default-graph-uri" form encoded parameter
+	 * @param namedgraphs the "named-graph-uri" form encoded parameter
+	 * @return the result of the SPARQL query
+	 */
 	@POST
 	@Path("/inference")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -152,6 +258,19 @@ public class SPARQLQuery extends AbstractSailsResource {
 				req, uriInfo, queryString, defgraphs, namedgraphs, "true");
 	}
 
+	/**
+	 * Query via POST directly (with inference).
+	 *
+	 * @see <a href="http://www.w3.org/TR/sparql11-protocol/#query-operation">
+	 * SPARQL 1.1 Protocol
+	 * </a>
+	 * @param req JAX-RS {@link Request} object
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param defgraphs the "default-graph-uri" form encoded parameter
+	 * @param namedgraphs the "named-graph-uri" form encoded parameter
+	 * @param queryString query as string (from HTTP request body)
+	 * @return the result of the SPARQL query
+	 */
 	@POST
 	@Path("/inference")
 	@Consumes(RDFMediaType.SPARQL_QUERY)
@@ -165,6 +284,25 @@ public class SPARQLQuery extends AbstractSailsResource {
 				req, uriInfo, queryString, defgraphs, namedgraphs, "true");
 	}
 
+	/**
+	 * Implements the handling of a SPARQL query.
+	 * 
+	 * This method accepts the different parameters for SPARQL requests,
+	 * executes the request (with optional inference) and returns the
+	 * result as JAX-RS HTTP response. The response will be streamed, so large
+	 * result sets are possible.
+	 * 
+	 * @see SPARQLTupleStreamingOutput
+	 * @see SPARQLBooleanStreamingOutput
+	 * @see SPARQLGraphStreamingOutput
+	 * @param req JAX-RS {@link Request} object
+	 * @param uriInfo JAX-RS {@link UriInfo} object
+	 * @param queryString SPARQL query to execute
+	 * @param defgraphs the "default-graph-uri" query parameter
+	 * @param namedgraphs the "named-graph-uri" query parameter
+	 * @param inference true, if the results should include inferred solutions
+	 * @return the result of the SPARQL query
+	 */
 	private Response handleQuery(
 			Request req,
 			UriInfo uriInfo,
@@ -174,24 +312,30 @@ public class SPARQLQuery extends AbstractSailsResource {
 			String inference) {
 		SailRepositoryConnection conn = null;
 		try {
+			// check for empty query
 			if (queryString == null) {
 				throw new MalformedQueryException("Missing query parameter");
 			}
 			conn = getConnection();
 			final Query query;
+			// check if the query should be rewritten for inference
 			if (inference != null && inference.equals("true")) {
+				// hand over to query rewriting component
 				QueryRewriter qw = qwfactory.getRewriter(conn);
 				query = qw.rewrite(
 						QueryLanguage.SPARQL,
 						queryString,
 						uriInfo.getAbsolutePath().toASCIIString());
 			} else {
+				// direct preparation using Sesame repository
 				query = conn.prepareQuery(
 						QueryLanguage.SPARQL,
 						queryString,
 						uriInfo.getAbsolutePath().toASCIIString());
 			}
+			// limit query execution time
 			query.setMaxQueryTime(timeout);
+			// check query form and possible result variants
 			final List<Variant> acceptable;
 			boolean isGraphQuery = false;
 			boolean isBooleanQuery = false;
@@ -208,12 +352,15 @@ public class SPARQLQuery extends AbstractSailsResource {
 				acceptable = queryResultVariants;
 			}
 			final Variant variant = req.selectVariant(acceptable);
+			// if acceptable variants does not match "Accept" header, abort
 			if (variant == null) {
 				return Response.notAcceptable(acceptable).build();
 			}
 			final MediaType mt = variant.getMediaType();
 			final String mtstr = mt.getType() + "/" + mt.getSubtype();
 			StreamingOutput stream;
+			// select result writer based on query form and return streaming
+			// output
 			if (isGraphQuery) {
 				GraphQuery gq = (GraphQuery) query;
 				stream = new SPARQLGraphStreamingOutput(
@@ -229,21 +376,37 @@ public class SPARQLQuery extends AbstractSailsResource {
 			}
 			return Response.ok(stream).type(mt).build();
 		} catch (MalformedQueryException ex) {
+			// syntax error
 			close(conn, ex);
 			String str = ex.getMessage();
 			return Response.status(Response.Status.BAD_REQUEST).entity(
 					str.getBytes(Charset.forName("UTF-8"))).build();
 		} catch (RepositoryException ex) {
+			// server error
 			close(conn, ex);
 			throw new WebApplicationException(ex);
 		}
 	}
 
+	/**
+	 * Returns a {@link RDFWriterFactory} that produces RDF data according to a
+	 * given MIME-type.
+	 *
+	 * @param mimetype the mimetype
+	 * @return the corresponding writer factory
+	 */
 	private RDFWriterFactory getRDFWriterFactory(String mimetype) {
 		RDFWriterRegistry registry = RDFWriterRegistry.getInstance();
 		return registry.get(getRDFFormat(mimetype));
 	}
 
+	/**
+	 * Returns a {@link TupleQueryResultWriterFactory} that returns a writer
+	 * that writes SPARQL query results in the format of a given MIME-Type.
+	 *
+	 * @param mimetype the mimetype
+	 * @return the corresponding query result writer factory
+	 */
 	private TupleQueryResultWriterFactory getTupleWriterFactory(String mimetype) {
 		switch (mimetype) {
 			default:
@@ -258,6 +421,13 @@ public class SPARQLQuery extends AbstractSailsResource {
 		}
 	}
 
+	/**
+	 * Returns a {@link BooleanQueryResultWriterFactory} that returns a writer
+	 * that writes SPARQL query results in the format of a given MIME-Type.
+	 *
+	 * @param mimetype the mimetype
+	 * @return the corresponding query result writer factory
+	 */
 	private BooleanQueryResultWriterFactory getBooleanWriterFactory(String mimetype) {
 		switch (mimetype) {
 			default:

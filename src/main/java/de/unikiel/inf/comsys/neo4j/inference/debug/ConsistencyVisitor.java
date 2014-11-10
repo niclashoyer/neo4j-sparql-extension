@@ -1,5 +1,27 @@
 package de.unikiel.inf.comsys.neo4j.inference.debug;
 
+/*
+ * #%L
+ * neo4j-sparql-extension
+ * %%
+ * Copyright (C) 2014 Niclas Hoyer
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import org.openrdf.query.algebra.Add;
 import org.openrdf.query.algebra.And;
 import org.openrdf.query.algebra.ArbitraryLengthPath;
@@ -63,6 +85,7 @@ import org.openrdf.query.algebra.Projection;
 import org.openrdf.query.algebra.ProjectionElem;
 import org.openrdf.query.algebra.ProjectionElemList;
 import org.openrdf.query.algebra.QueryModelNode;
+import org.openrdf.query.algebra.QueryModelVisitor;
 import org.openrdf.query.algebra.QueryRoot;
 import org.openrdf.query.algebra.Reduced;
 import org.openrdf.query.algebra.Regex;
@@ -80,13 +103,25 @@ import org.openrdf.query.algebra.Var;
 import org.openrdf.query.algebra.ZeroLengthPath;
 import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
 
+/**
+ * A {@link QueryModelVisitor} implementation that checks that each parent/child
+ * relation is consitent.
+ *
+ * This visitor checks for each node that a parent node has this node as a
+ * children. Complex transformations on nodes using the visitor pattern can
+ * cause a situation in that a node refers to a parent node, but that parent
+ * node does not have the referencing node as a child.
+ *
+ * If the visitor encounters such a node it will throw a
+ * {@link IllegalStateException}.
+ */
 public class ConsistencyVisitor
 		extends QueryModelVisitorBase<RuntimeException> {
-	
+
 	public ConsistencyVisitor() {
 		super();
 	}
-	
+
 	private void check(QueryModelNode node) {
 		checkParentChild(node);
 	}

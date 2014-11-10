@@ -2,6 +2,8 @@ package de.unikiel.inf.comsys.neo4j.inference;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rule;
+import de.unikiel.inf.comsys.neo4j.inference.rules.Rules;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
