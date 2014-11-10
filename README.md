@@ -145,4 +145,4 @@ de.unikiel.inf.comsys.neo4j.chunksize = 1000
 
 ## License
 
-GPLv3
+[GPLv3](https://github.com/niclashoyer/neo4j-sparql-extension/blob/master/LICENSE)
